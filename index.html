@@ -695,7 +695,7 @@ function openSafetyPage() {
 
 let __leavingApp = false;
 (function initHistoryGuard() {
-  try { history.replaceState({ trap: true, ts: Date.now() }, ''); } catch (e) {}
+  try { history.pushState({ trap: true, ts: Date.now() }, ''); } catch (e) {}
 
   window.addEventListener('popstate', () => {
     if (__leavingApp) return;
@@ -1292,6 +1292,7 @@ function showGroupListModal(group) {
 function showItemModal(group, item) {
   document.getElementById('modalName').textContent = item.n;
   document.getElementById('modalAddr').textContent = item.a || '';
+  document.getElementById('appModal').style.height = (window.innerHeight * 0.92) + 'px';
   updateItemSummary(item);
   const body = document.getElementById('modalBody');
   body.innerHTML = '';
