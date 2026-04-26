@@ -831,39 +831,3 @@ function showToast(msg) {
 </script>
 </body>
 </html>
-s.forEach(it => { it.reservations = generateMockReservations(); }));
-  renderMarkers();
-  renderList();
-  const ctx = getCurrentItem();
-  if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
-  showToast('새로고침 완료');
-}
-
-function formatHour(hour) {
-  if (hour < 12) return '오전 ' + hour + '시';
-  if (hour === 12) return '오후 12시';
-  if (hour === 24) return '자정';
-  return '오후 ' + (hour - 12) + '시';
-}
-
-function dist(a, b) {
-  const dx = (a.lng - b.lng) * 88;
-  const dy = (a.lat - b.lat) * 111;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-function escapeHtml(s) {
-  return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-}
-
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
-}
-</script>
-</body>
-</html>
