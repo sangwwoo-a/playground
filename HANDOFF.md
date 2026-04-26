@@ -1,4 +1,4 @@
-# 오늘의놀이터 — 인수인계 문서
+# 놀이터 친구 찾기 — 인수인계 문서
 
 **작성일**: 2026-04-26
 **작성자**: Claude (이전 세션)
@@ -30,7 +30,7 @@
 ## 3. 파일 구조
 
 ```
-오늘의놀이터/
+놀이터 친구 찾기/
 ├── index.html               # 앱 본체 (배포 대상, 833줄)
 ├── playgrounds.json         # 행안부 원본 5.4MB (배포 대상, 37,956곳)
 ├── playgrounds-geo.json     # 그룹화+지오코딩된 9.74MB (배포 대상, 24,242그룹)
@@ -285,7 +285,7 @@ el.innerHTML = '<div class="flag-bubble ' + cls + '">' + (total === 0 ? '0명' :
 
 ### 1단계: 현재 상태 파악
 ```powershell
-cd "C:\Users\sangw\OneDrive\바탕 화면\오늘의놀이터"
+cd "C:\Users\sangw\OneDrive\바탕 화면\놀이터 친구 찾기"
 (Get-Content index.html -Encoding UTF8).Count   # 833 나와야 정상
 git status                                       # main, up to date
 git log --oneline -5
