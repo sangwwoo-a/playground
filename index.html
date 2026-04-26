@@ -46,8 +46,13 @@ body { display: flex; justify-content: center; }
 .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-coral); display: inline-block; }
 .me-badge { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 6px; background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-pill); font-size: var(--t-sm); font-weight: var(--w-m); color: var(--c-ink-2); cursor: pointer; }
 .me-badge .me-avatar { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #FFD8A8, #FFB088); display: grid; place-items: center; font-size: 12px; }
-.search { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-md); color: var(--c-ink-3); font-size: var(--t-sm); font-weight: var(--w-m); cursor: pointer; }
-.search svg { flex-shrink: 0; color: var(--c-ink-3); }
+.date-bar { display: flex; align-items: center; gap: 4px; padding: 6px 6px; background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-md); }
+.date-nav { width: 36px; height: 36px; display: grid; place-items: center; background: none; border: none; color: var(--c-ink-2); cursor: pointer; border-radius: var(--r-sm); transition: background 0.12s; }
+.date-nav:active { background: var(--c-bg); }
+.date-nav:disabled { color: var(--c-ink-4); cursor: not-allowed; }
+.date-nav:disabled:active { background: transparent; }
+.date-label { flex: 1; text-align: center; font-size: var(--t-md); font-weight: var(--w-sb); color: var(--c-ink); letter-spacing: -0.01em; }
+.date-label .date-sub { font-size: var(--t-xs); color: var(--c-ink-3); margin-left: 6px; font-weight: var(--w-m); }
 #map { width: 100%; height: 100%; background: #e8eef0; }
 .playground-flag { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .playground-flag:active { transform: scale(0.92); }
@@ -88,7 +93,7 @@ body { display: flex; justify-content: center; }
 .modal-pg-summary { margin-top: 14px; padding: 10px 14px; background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-md); font-size: var(--t-sm); color: var(--c-ink); font-weight: var(--w-sb); }
 .modal-pg-summary b { color: var(--c-coral-deep); font-weight: var(--w-b); }
 .modal-pg-summary.empty { background: var(--c-bg); color: var(--c-ink-3); border-color: var(--c-line-soft); }
-.modal-body { padding: 8px 0 16px; overflow-y: auto; flex: 1; }
+.modal-body { padding: 8px 0 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1 1 auto; min-height: 0; touch-action: pan-y; overscroll-behavior: contain; }
 .section-title { font-size: var(--t-xs); font-weight: var(--w-b); color: var(--c-ink-3); letter-spacing: 0.04em; text-transform: uppercase; margin: 0; padding: 16px 20px 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .section-title span { color: var(--c-ink-3); font-weight: var(--w-m); text-transform: none; letter-spacing: 0; }
 .timeslot-list { display: flex; flex-direction: column; }
@@ -212,6 +217,38 @@ body { display: flex; justify-content: center; }
 .map-btn:active { background: var(--c-bg); }
 </style>
 <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=298aeb2bbbab45bba43939a427b6b381&libraries=services" onerror="window.__kakaoLoadFailed=true"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getFirestore, collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAW7TmHVsWL1b4ZJBYl2E6SM7gPyyXJQag",
+  authDomain: "playgroundo-a01ec.firebaseapp.com",
+  projectId: "playgroundo-a01ec",
+  storageBucket: "playgroundo-a01ec.firebasestorage.app",
+  messagingSenderId: "275920912808",
+  appId: "1:275920912808:web:1ba0c504ccf6aa31a11d9d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.fb = { db, auth, collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, uid: null };
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.fb.uid = user.uid;
+    window.dispatchEvent(new CustomEvent('firebase:ready'));
+  }
+});
+
+signInAnonymously(auth).catch((err) => {
+  console.error('Firebase anon sign-in failed:', err);
+  window.dispatchEvent(new CustomEvent('firebase:error', { detail: err.message }));
+});
+</script>
 </head>
 <body>
 <div class="app">
@@ -220,7 +257,11 @@ body { display: flex; justify-content: center; }
 <div class="title"><span class="brand-dot"></span>오늘의 놀이터</div>
 <div class="me-badge" id="meBadge" onclick="openMePage()"><span class="me-avatar" id="meIcon">👤</span><span id="meName">설정하기</span></div>
 </div>
-<div class="search" onclick="showToast('검색은 곧 지원될 예정이에요')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="5"/><path d="M11 11 L14 14" stroke-linecap="round"/></svg><span>동네·아파트·놀이터 검색</span></div>
+<div class="date-bar">
+<button class="date-nav" id="datePrev" onclick="changeDate(-1)" aria-label="이전 날"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18 L9 12 L15 6"/></svg></button>
+<div class="date-label" id="dateLabel">오늘</div>
+<button class="date-nav" id="dateNext" onclick="changeDate(1)" aria-label="다음 날"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18 L15 12 L9 6"/></svg></button>
+</div>
 </div>
 <div id="map"></div>
 <div class="map-controls">
@@ -365,11 +406,20 @@ const state = {
   me: null, myLocation: null, groups: [], allPlaygrounds: null, allGroups: null,
   selectedGroupId: null, viewingItemId: null,
   map: null, markers: [], meMarker: null,
-  demoMode: true,
+  demoMode: false,
+  selectedDate: new Date(),
 };
 
 window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('setupModal').classList.add('show');
+  state.uid = getOrCreateUserId();
+  updateDateUI();
+  const savedMe = loadMeFromStorage();
+  if (savedMe && savedMe.nickname) {
+    state.me = savedMe;
+    updateMeBadge();
+  } else {
+    document.getElementById('setupModal').classList.add('show');
+  }
   initLocation(() => initMap());
 });
 
@@ -457,10 +507,148 @@ function saveSetup() {
   if (nickname.length < 2) { showToast('닉네임은 2자 이상 입력해주세요'); return; }
   if (onboard.age === null) { showToast('아이 나이를 선택해주세요'); return; }
   state.me = { nickname, age: String(onboard.age), gender: onboard.gender, verified: false };
+  saveMeToStorage();
   document.getElementById('setupModal').classList.remove('show');
   updateMeBadge();
   showToast('환영해요, ' + nickname + '님!');
 }
+
+const ME_STORAGE_KEY = 'playground.me.v1';
+const UID_STORAGE_KEY = 'playground.uid.v1';
+
+function saveMeToStorage() {
+  try { localStorage.setItem(ME_STORAGE_KEY, JSON.stringify(state.me)); } catch (e) {}
+}
+
+function loadMeFromStorage() {
+  try {
+    const raw = localStorage.getItem(ME_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+
+function getOrCreateUserId() {
+  try {
+    let uid = localStorage.getItem(UID_STORAGE_KEY);
+    if (!uid) {
+      uid = 'anon_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+      localStorage.setItem(UID_STORAGE_KEY, uid);
+    }
+    return uid;
+  } catch (e) {
+    return 'anon_session_' + Date.now();
+  }
+}
+
+let fbUnsub = null;
+
+const MAX_FUTURE_DAYS = 6;
+
+function dateToKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function todayKey() { return dateToKey(new Date()); }
+function selectedDateKey() {
+  const d = state.selectedDate || new Date();
+  return dateToKey(d);
+}
+function isSelectedDateToday() {
+  return selectedDateKey() === todayKey();
+}
+function diffFromToday(d) {
+  const a = new Date(); a.setHours(0,0,0,0);
+  const b = new Date(d); b.setHours(0,0,0,0);
+  return Math.round((b - a) / 86400000);
+}
+
+const KO_WEEKDAYS = ['일','월','화','수','목','금','토'];
+function formatDateLabel(d) {
+  const diff = diffFromToday(d);
+  const m = d.getMonth() + 1, day = d.getDate(), w = KO_WEEKDAYS[d.getDay()];
+  const sub = m + '월 ' + day + '일 (' + w + ')';
+  if (diff === 0) return '오늘<span class="date-sub">' + sub + '</span>';
+  if (diff === 1) return '내일<span class="date-sub">' + sub + '</span>';
+  if (diff === 2) return '모레<span class="date-sub">' + sub + '</span>';
+  return sub;
+}
+
+function updateDateUI() {
+  const d = state.selectedDate;
+  document.getElementById('dateLabel').innerHTML = formatDateLabel(d);
+  const diff = diffFromToday(d);
+  document.getElementById('datePrev').disabled = diff <= 0;
+  document.getElementById('dateNext').disabled = diff >= MAX_FUTURE_DAYS;
+}
+
+function changeDate(delta) {
+  const d = new Date(state.selectedDate);
+  d.setDate(d.getDate() + delta);
+  const diff = diffFromToday(d);
+  if (diff < 0 || diff > MAX_FUTURE_DAYS) return;
+  state.selectedDate = d;
+  updateDateUI();
+  if (state.demoMode) {
+    state.groups.forEach(g => g.items.forEach(it => { it.reservations = generateMockReservations(); }));
+    renderMarkers(); renderList();
+    const ctx = getCurrentItem();
+    if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
+  } else {
+    teardownCloudSync();
+    state.groups.forEach(g => g.items.forEach(it => { it.reservations = []; }));
+    renderMarkers(); renderList();
+    const ctx = getCurrentItem();
+    if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
+    ensureCloudSync();
+  }
+}
+
+function ensureCloudSync() {
+  if (state.demoMode) return;
+  if (!window.fb || !window.fb.uid) return;
+  if (!state.groups || !state.groups.length) return;
+  if (fbUnsub) return;
+  state.uid = window.fb.uid;
+  const { db, collection, query, where, onSnapshot } = window.fb;
+  const q = query(collection(db, 'reservations'), where('date', '==', selectedDateKey()));
+  fbUnsub = onSnapshot(q, applyFirestoreSnapshot, (err) => {
+    console.error('Firestore subscription error:', err);
+    showToast('서버 연결 오류: ' + err.code);
+  });
+}
+
+function teardownCloudSync() {
+  if (fbUnsub) { fbUnsub(); fbUnsub = null; }
+}
+
+function applyFirestoreSnapshot(snap) {
+  const itemIdx = new Map();
+  state.groups.forEach(g => g.items.forEach(it => { it.reservations = []; itemIdx.set(it.itemId, it); }));
+  snap.forEach(docSnap => {
+    const d = docSnap.data();
+    const item = itemIdx.get(d.itemId);
+    if (!item) return;
+    item.reservations.push({
+      id: docSnap.id,
+      userId: d.userId,
+      nickname: d.profile && d.profile.nickname,
+      age: d.profile && d.profile.age,
+      gender: d.profile && d.profile.gender,
+      startHour: d.hour,
+      endHour: d.hour + 1,
+      mine: d.userId === state.uid,
+    });
+  });
+  if (state.map) { renderMarkers(); renderList(); }
+  const ctx = getCurrentItem();
+  if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
+  if (document.getElementById('mePage') && document.getElementById('mePage').classList.contains('show')) renderMyPromises();
+}
+
+window.addEventListener('firebase:ready', ensureCloudSync);
+window.addEventListener('firebase:error', (e) => {
+  showToast('서버 인증 실패: ' + (e.detail || ''));
+});
 
 function openSetup() {
   if (state.me) {
@@ -815,7 +1003,7 @@ function filterAndDisplay() {
     .sort((a, b) => a.d - b.d)
     .slice(0, MAX_DISPLAY);
   state.groups = nearby.map(o => {
-    o.g.items.forEach(it => { it.reservations = generateMockReservations(); });
+    o.g.items.forEach(it => { it.reservations = state.demoMode ? generateMockReservations() : []; });
     return o.g;
   });
   if (state.groups.length === 0) {
@@ -823,7 +1011,7 @@ function filterAndDisplay() {
       .map(g => ({ g, d: dist(me, { lat: g.lat, lng: g.lng }) }))
       .sort((a, b) => a.d - b.d).slice(0, 30);
     state.groups = fallback.map(o => {
-      o.g.items.forEach(it => { it.reservations = generateMockReservations(); });
+      o.g.items.forEach(it => { it.reservations = state.demoMode ? generateMockReservations() : []; });
       return o.g;
     });
     showToast('가까운 ' + state.groups.length + '곳');
@@ -833,6 +1021,7 @@ function filterAndDisplay() {
   }
   renderMarkers();
   renderList();
+  ensureCloudSync();
 }
 
 function generateMockReservations() {
@@ -867,21 +1056,21 @@ function myReservationInItem(item) {
 }
 
 function countItemTotal(item) {
-  const now = new Date();
-  const currentHour = now.getHours();
   const reservations = item.reservations || [];
-  const filtered = state.demoMode ? reservations : reservations.filter(r => r.endHour > currentHour);
+  const isToday = isSelectedDateToday();
+  const currentHour = new Date().getHours();
+  const filtered = (state.demoMode || !isToday) ? reservations : reservations.filter(r => r.endHour > currentHour);
   const uniq = new Set(filtered.map(r => r.userId));
   return uniq.size;
 }
 
 function countGroupTotal(group) {
-  const now = new Date();
-  const currentHour = now.getHours();
+  const isToday = isSelectedDateToday();
+  const currentHour = new Date().getHours();
   const uniq = new Set();
   group.items.forEach(it => {
     (it.reservations || []).forEach(r => {
-      if (state.demoMode || r.endHour > currentHour) uniq.add(r.userId);
+      if (state.demoMode || !isToday || r.endHour > currentHour) uniq.add(r.userId);
     });
   });
   return uniq.size;
@@ -1028,8 +1217,9 @@ function renderTimeslots(item) {
   const now = new Date();
   const currentHour = now.getHours();
 
+  const isToday = isSelectedDateToday();
   TIME_SLOTS.forEach(hour => {
-    const past = !state.demoMode && hour < currentHour;
+    const past = !state.demoMode && isToday && hour < currentHour;
     const kids = kidsAtHourInItem(item, hour);
     const mineHere = kids.some(k => k.mine);
     const conflict = !mineHere && findMyReservationAtHour(hour);
@@ -1071,35 +1261,69 @@ function findMyReservationAtHour(hour) {
   return null;
 }
 
-function toggleHourReservation(itemId, hour) {
+async function toggleHourReservation(itemId, hour) {
   if (!state.me) { showToast('먼저 닉네임을 설정해주세요'); openSetup(); return; }
   const ctx = getCurrentItem();
   if (!ctx || ctx.item.itemId !== itemId) return;
   const item = ctx.item;
   const mineHere = (item.reservations || []).find(r => r.mine && r.startHour === hour && r.endHour === hour + 1);
-  if (mineHere) {
-    item.reservations = item.reservations.filter(r => r !== mineHere);
-    showToast(formatHour(hour) + ' 취소했어요');
-  } else {
-    const conflict = findMyReservationAtHour(hour);
-    if (conflict) {
-      const where = conflict.item.itemId === itemId ? '이 놀이터' : '다른 놀이터';
-      showToast(formatHour(hour) + '에 ' + where + ' 약속이 있어요');
-      return;
+
+  if (state.demoMode) {
+    if (mineHere) {
+      item.reservations = item.reservations.filter(r => r !== mineHere);
+      showToast(formatHour(hour) + ' 취소했어요');
+    } else {
+      const conflict = findMyReservationAtHour(hour);
+      if (conflict) {
+        const where = conflict.item.itemId === itemId ? '이 놀이터' : '다른 놀이터';
+        showToast(formatHour(hour) + '에 ' + where + ' 약속이 있어요');
+        return;
+      }
+      item.reservations = item.reservations || [];
+      item.reservations.push({
+        userId: 'me',
+        nickname: state.me.nickname, age: parseInt(state.me.age),
+        gender: state.me.gender, verified: state.me.verified, mine: true,
+        startHour: hour, endHour: hour + 1,
+      });
+      showToast(formatHour(hour) + ' 등록 완료!');
     }
-    item.reservations = item.reservations || [];
-    item.reservations.push({
-      userId: 'me',
-      nickname: state.me.nickname, age: parseInt(state.me.age),
-      gender: state.me.gender, verified: state.me.verified, mine: true,
-      startHour: hour, endHour: hour + 1,
+    renderTimeslots(item); renderMarkers(); renderList(); updateItemSummary(item);
+    return;
+  }
+
+  if (!window.fb || !window.fb.uid) { showToast('서버 연결 중... 잠시 후 다시 시도해주세요'); return; }
+  const { db, collection, addDoc, deleteDoc, doc, serverTimestamp } = window.fb;
+
+  if (mineHere && mineHere.id) {
+    try {
+      await deleteDoc(doc(db, 'reservations', mineHere.id));
+      showToast(formatHour(hour) + ' 취소했어요');
+    } catch (e) {
+      console.error(e); showToast('취소 실패: ' + (e.code || e.message));
+    }
+    return;
+  }
+
+  const conflict = findMyReservationAtHour(hour);
+  if (conflict) {
+    const where = conflict.item.itemId === itemId ? '이 놀이터' : '다른 놀이터';
+    showToast(formatHour(hour) + '에 ' + where + ' 약속이 있어요');
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, 'reservations'), {
+      itemId, hour,
+      date: selectedDateKey(),
+      userId: state.uid,
+      profile: { nickname: state.me.nickname, age: parseInt(state.me.age), gender: state.me.gender },
+      createdAt: serverTimestamp()
     });
     showToast(formatHour(hour) + ' 등록 완료!');
+  } catch (e) {
+    console.error(e); showToast('등록 실패: ' + (e.code || e.message));
   }
-  renderTimeslots(item);
-  renderMarkers();
-  renderList();
-  updateItemSummary(item);
 }
 
 function closeModal() {
@@ -1115,9 +1339,11 @@ function closeModalBackdrop(e) {
 function toggleDemoMode() {
   state.demoMode = !state.demoMode;
   if (state.demoMode) {
+    teardownCloudSync();
     state.groups.forEach(g => g.items.forEach(it => { it.reservations = generateMockReservations(); }));
   } else {
     state.groups.forEach(g => g.items.forEach(it => { it.reservations = []; }));
+    ensureCloudSync();
   }
   renderMarkers();
   renderList();
