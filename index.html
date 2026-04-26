@@ -57,8 +57,11 @@ body { display: flex; justify-content: center; }
 .flag-bubble.lots { background: var(--pin-busy); }
 .flag-bubble .group-count { background: rgba(255,255,255,0.25); padding: 1px 5px; border-radius: var(--r-pill); font-size: 10px; font-weight: var(--w-b); color: #fff; position: static; border: none; }
 .me-marker { width: 18px; height: 18px; background: #007aff; border: 3px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); }
-.bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: var(--c-card); border-top-left-radius: var(--r-2xl); border-top-right-radius: var(--r-2xl); box-shadow: var(--sh-modal); z-index: 5; max-height: 50%; display: flex; flex-direction: column; overflow: hidden; padding-bottom: env(safe-area-inset-bottom); }
-.sheet-handle { width: 36px; height: 4px; background: var(--c-ink-4); border-radius: 2px; margin: 8px auto 4px; }
+.bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: var(--c-card); border-top-left-radius: var(--r-2xl); border-top-right-radius: var(--r-2xl); box-shadow: var(--sh-modal); z-index: 5; height: var(--sheet-h, 45vh); display: flex; flex-direction: column; overflow: hidden; padding-bottom: env(safe-area-inset-bottom); transition: height 0.25s cubic-bezier(0.34, 1.2, 0.64, 1); will-change: height; }
+.bottom-sheet.dragging { transition: none; }
+.sheet-grip { padding: 10px 0 6px; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.sheet-grip:active { cursor: grabbing; }
+.sheet-handle { width: 36px; height: 4px; background: var(--c-ink-4); border-radius: 2px; margin: 0 auto; }
 .sheet-header { padding: 8px 20px 12px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .sheet-title { font-size: var(--t-lg); font-weight: var(--w-b); color: var(--c-ink); letter-spacing: -0.01em; }
 .sheet-meta { font-size: var(--t-xs); color: var(--c-ink-3); font-weight: var(--w-m); }
@@ -201,7 +204,8 @@ body { display: flex; justify-content: center; }
 .safety-list li strong { color: var(--c-ink); font-weight: var(--w-b); }
 .toast { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(40, 30, 20, 0.92); color: #fff; padding: 12px 20px; border-radius: var(--r-pill); font-size: var(--t-sm); font-weight: var(--w-m); z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s; box-shadow: var(--sh-3); white-space: nowrap; }
 .toast.show { opacity: 1; }
-.map-controls { position: absolute; right: 12px; bottom: calc(50% + 12px); z-index: 4; display: flex; flex-direction: column; gap: 8px; }
+.map-controls { position: absolute; right: 12px; bottom: calc(var(--sheet-h, 45vh) + 12px); z-index: 4; display: flex; flex-direction: column; gap: 8px; transition: bottom 0.25s cubic-bezier(0.34, 1.2, 0.64, 1); }
+.bottom-sheet.dragging ~ .map-controls { transition: none; }
 .map-btn { width: 44px; height: 44px; background: var(--c-card); border: 1px solid var(--c-line-soft); border-radius: 50%; box-shadow: var(--sh-2); cursor: pointer; font-size: 18px; color: var(--c-ink-2); display: grid; place-items: center; }
 .map-btn:active { background: var(--c-bg); }
 </style>
@@ -221,8 +225,8 @@ body { display: flex; justify-content: center; }
 <button class="map-btn" onclick="centerToMe()" aria-label="현위치"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2 v3 M12 19 v3 M2 12 h3 M19 12 h3"/></svg></button>
 <button class="map-btn" onclick="refreshData()" aria-label="새로고침"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 a9 9 0 0 1 15.5 -6.3 L21 8"/><path d="M21 3 v5 h-5"/><path d="M21 12 a9 9 0 0 1 -15.5 6.3 L3 16"/><path d="M3 21 v-5 h5"/></svg></button>
 </div>
-<div class="bottom-sheet">
-<div class="sheet-handle"></div>
+<div class="bottom-sheet" id="bottomSheet">
+<div class="sheet-grip" id="sheetGrip"><div class="sheet-handle"></div></div>
 <div class="sheet-header"><div class="sheet-title">근처 놀이터</div><div class="sheet-meta" id="sheetCount">0곳</div></div>
 <div class="sheet-list" id="sheetList"></div>
 </div>
@@ -494,6 +498,76 @@ function openSafetyPage() {
 function closeSafetyPage() {
   document.getElementById('safetyPage').classList.remove('show');
 }
+
+const SHEET_MIN = 96;
+function sheetSnaps() {
+  const vh = window.innerHeight;
+  return [SHEET_MIN, Math.round(vh * 0.45), Math.round(vh * 0.85)];
+}
+function setSheetHeight(px) {
+  const vh = window.innerHeight;
+  const clamped = Math.max(SHEET_MIN, Math.min(vh * 0.9, px));
+  document.documentElement.style.setProperty('--sheet-h', clamped + 'px');
+}
+function snapSheet() {
+  const sheet = document.getElementById('bottomSheet');
+  const cur = sheet.offsetHeight;
+  const snaps = sheetSnaps();
+  const target = snaps.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a);
+  setSheetHeight(target);
+}
+
+(function initSheetDrag() {
+  const sheet = document.getElementById('bottomSheet');
+  const grip = document.getElementById('sheetGrip');
+  if (!sheet || !grip) return;
+  let dragY = null, startH = 0, lastY = 0, lastT = 0, vY = 0;
+
+  function onDown(e) {
+    dragY = (e.touches ? e.touches[0].clientY : e.clientY);
+    startH = sheet.offsetHeight;
+    lastY = dragY; lastT = Date.now(); vY = 0;
+    sheet.classList.add('dragging');
+    if (e.cancelable) e.preventDefault();
+  }
+  function onMove(e) {
+    if (dragY === null) return;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY);
+    const dy = y - dragY;
+    const now = Date.now();
+    vY = (y - lastY) / Math.max(1, now - lastT);
+    lastY = y; lastT = now;
+    setSheetHeight(startH - dy);
+    if (e.cancelable) e.preventDefault();
+  }
+  function onUp() {
+    if (dragY === null) return;
+    dragY = null;
+    sheet.classList.remove('dragging');
+    const cur = sheet.offsetHeight;
+    const snaps = sheetSnaps();
+    let target;
+    if (Math.abs(vY) > 0.5) {
+      target = vY < 0 ? (cur < snaps[1] ? snaps[1] : snaps[2]) : (cur > snaps[1] ? snaps[1] : snaps[0]);
+    } else {
+      target = snaps.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a);
+    }
+    setSheetHeight(target);
+  }
+
+  grip.addEventListener('touchstart', onDown, { passive: false });
+  window.addEventListener('touchmove', onMove, { passive: false });
+  window.addEventListener('touchend', onUp);
+  grip.addEventListener('mousedown', onDown);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+  grip.addEventListener('click', () => {
+    const cur = sheet.offsetHeight;
+    const [lo, mid, hi] = sheetSnaps();
+    setSheetHeight(cur < mid - 20 ? mid : cur < hi - 20 ? hi : lo);
+  });
+  window.addEventListener('resize', snapSheet);
+})();
 
 function renderMyPromises() {
   const list = document.getElementById('myPromiseList');
