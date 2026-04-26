@@ -83,43 +83,27 @@ body { display: flex; justify-content: center; }
 .modal-body { padding: 8px 0 16px; overflow-y: auto; flex: 1; }
 .section-title { font-size: var(--t-xs); font-weight: var(--w-b); color: var(--c-ink-3); letter-spacing: 0.04em; text-transform: uppercase; margin: 0; padding: 16px 20px 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .section-title span { color: var(--c-ink-3); font-weight: var(--w-m); text-transform: none; letter-spacing: 0; }
-.timeslot-list { display: flex; flex-direction: column; gap: 6px; }
-.timeslot { background: #fafafa; border-radius: 12px; padding: 10px 12px; display: grid; grid-template-columns: 56px 1fr; gap: 10px; align-items: center; }
-.timeslot.has-kids { background: #fff7f7; }
-.timeslot.expanded { padding-bottom: 12px; }
+.timeslot-list { display: flex; flex-direction: column; }
+.timeslot { display: flex; align-items: center; padding: 14px 20px; gap: 12px; border-bottom: 1px solid var(--c-line-soft); transition: background 0.12s; }
+.timeslot:last-child { border-bottom: none; }
+.timeslot.has-kids { background: var(--c-coral-soft); }
+.timeslot.mine { background: var(--c-coral-soft); }
 .timeslot.past { opacity: 0.5; }
-.ts-time { font-size: 14px; font-weight: 700; color: #222; }
-.ts-time-period { font-size: 10px; color: #999; display: block; }
-.ts-info { display: flex; align-items: center; gap: 8px; }
-.ts-count { font-size: 13px; font-weight: 700; color: #ff5a5f; }
-.ts-count.zero { color: #ccc; }
-.ts-avatars { display: flex; align-items: center; }
-.ts-avatar { width: 22px; height: 22px; border-radius: 50%; background: #ffd5d6; color: #ff5a5f; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 2px solid #fff; margin-left: -6px; }
-.ts-avatar:first-child { margin-left: 0; }
-.ts-avatar.boy { background: #d6e7ff; color: #4a90e2; }
-.ts-avatar.girl { background: #ffd9ec; color: #e84a8e; }
-.ts-avatar.me { background: #ff5a5f; color: #fff; }
-.ts-avatar-more { width: 22px; height: 22px; border-radius: 50%; background: #f0f0f0; color: #888; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-left: -6px; border: 2px solid #fff; }
-.ts-detail { grid-column: 1 / -1; margin-top: 8px; padding-top: 10px; border-top: 1px dashed #ebebeb; display: none; flex-wrap: wrap; gap: 6px; }
-.timeslot.expanded .ts-detail { display: flex; }
-.kid-chip { background: #fff; border: 1px solid #ffd9da; border-radius: 14px; padding: 4px 10px; font-size: 11px; color: #555; }
-.kid-chip.me { background: #ff5a5f; color: #fff; border-color: #ff5a5f; }
-.timeslot.selecting { cursor: pointer; background: #fff; border: 2px dashed #e0e0e0; padding: 8px 10px; }
-.timeslot.selecting.range-start, .timeslot.selecting.range-end { background: #ff5a5f !important; color: #fff; }
-.timeslot.selecting.range-middle { background: #ffe5e6 !important; }
-.timeslot.selecting.disabled-pick { opacity: 0.3; pointer-events: none; }
-.range-banner { background: linear-gradient(135deg, #ff5a5f, #ff8a5f); color: #fff; padding: 12px 14px; border-radius: 12px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.range-banner-left { flex: 1; }
-.range-banner-time { font-size: 14px; font-weight: 700; }
-.range-banner-actions { display: flex; gap: 6px; }
-.range-btn { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
-.range-btn.confirm { background: #fff; color: #ff5a5f; }
-.range-btn:disabled { opacity: 0.5; }
-.my-reservation { background: #e8f5e9; border: 1px solid #a8e3ad; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-.my-reservation-info { color: #1b7a3a; font-weight: 700; font-size: 13px; }
-.my-reservation-info small { display: block; font-weight: 500; font-size: 11px; }
-.my-reservation-cancel { background: #fff; border: 1px solid #34c759; color: #1b7a3a; border-radius: 8px; padding: 6px 12px; font-size: 11px; cursor: pointer; }
-.start-join-btn { background: #ff5a5f; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 12px; }
+.ts-time { width: 56px; flex-shrink: 0; font-size: var(--t-lg); font-weight: var(--w-b); color: var(--c-ink); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.ts-time-suffix { font-size: var(--t-sm); font-weight: var(--w-m); color: var(--c-ink-3); margin-left: 1px; }
+.ts-info { flex: 1; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-height: 28px; }
+.ts-empty { font-size: var(--t-sm); color: var(--c-ink-3); }
+.kid-chip { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: var(--r-pill); font-size: var(--t-xs); font-weight: var(--w-b); background: var(--c-bg); color: var(--c-ink-2); font-variant-numeric: tabular-nums; }
+.kid-chip.boy { background: var(--c-sky-soft); color: var(--c-sky-deep); }
+.kid-chip.girl { background: #FCE4EC; color: #C2185B; }
+.kid-chip.me { background: var(--c-coral); color: #fff; }
+.ts-tag { flex-shrink: 0; padding: 6px 12px; border-radius: var(--r-pill); font-size: var(--t-sm); font-weight: var(--w-b); }
+.ts-tag--mine { background: var(--c-coral); color: #fff; }
+.ts-tag--mute { background: var(--c-bg); color: var(--c-ink-3); }
+.timeslot:not(.blocked):active { background: var(--c-bg); }
+.timeslot.mine:active { background: var(--c-coral-soft); filter: brightness(0.97); }
+.timeslot.blocked .ts-time { color: var(--c-ink-3); }
+.timeslot.blocked .ts-time-suffix { color: var(--c-ink-4); }
 .group-list-item { display: flex; align-items: center; padding: 14px 20px; gap: 12px; border-bottom: 1px solid var(--c-line-soft); cursor: pointer; transition: background 0.12s; }
 .group-list-item:active { background: var(--c-bg); }
 .group-list-item:last-child { border-bottom: none; }
@@ -210,8 +194,6 @@ body { display: flex; justify-content: center; }
 <script>
 const TIME_SLOTS = [];
 for (let h = 7; h <= 21; h++) TIME_SLOTS.push(h);
-const MIN_HOURS = 1;
-const MAX_HOURS = 4;
 const SEARCH_RADIUS_M = 1000;
 const MAX_DISPLAY = 50;
 
@@ -220,7 +202,6 @@ const state = {
   selectedGroupId: null, viewingItemId: null,
   map: null, markers: [], meMarker: null,
   demoMode: true,
-  rangeMode: false, rangeStart: null, rangeEnd: null, rangeForItemId: null,
 };
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -489,21 +470,20 @@ function countItemTotal(item) {
   const currentHour = now.getHours();
   const reservations = item.reservations || [];
   const filtered = state.demoMode ? reservations : reservations.filter(r => r.endHour > currentHour);
-  return filtered.length;
+  const uniq = new Set(filtered.map(r => r.userId));
+  return uniq.size;
 }
 
 function countGroupTotal(group) {
-  return group.items.reduce((sum, it) => sum + countItemTotal(it), 0);
-}
-
-function findMyReservationAnywhere() {
-  for (const g of state.groups) {
-    for (const it of g.items) {
-      const mine = (it.reservations || []).find(r => r.mine);
-      if (mine) return { group: g, item: it, reservation: mine };
-    }
-  }
-  return null;
+  const now = new Date();
+  const currentHour = now.getHours();
+  const uniq = new Set();
+  group.items.forEach(it => {
+    (it.reservations || []).forEach(r => {
+      if (state.demoMode || r.endHour > currentHour) uniq.add(r.userId);
+    });
+  });
+  return uniq.size;
 }
 
 function renderMarkers() {
@@ -646,175 +626,85 @@ function renderTimeslots(item) {
   list.innerHTML = '';
   const now = new Date();
   const currentHour = now.getHours();
-  const mine = myReservationInItem(item);
-  const isRangeMode = state.rangeMode && state.rangeForItemId === item.itemId;
-
-  if (isRangeMode) {
-    let timeText;
-    if (state.rangeStart === null) timeText = '시작 시간을 탭하세요';
-    else if (state.rangeEnd === null) timeText = formatHour(state.rangeStart) + ' ~ 종료 시간 탭';
-    else timeText = formatHour(state.rangeStart) + ' ~ ' + formatHour(state.rangeEnd + 1);
-    const canConfirm = state.rangeStart !== null && state.rangeEnd !== null;
-    const banner = document.createElement('div');
-    banner.className = 'range-banner';
-    banner.innerHTML = '<div class="range-banner-left"><div style="font-size:11px;opacity:0.9;">놀러올 시간 선택</div><div class="range-banner-time">' + timeText + '</div></div><div class="range-banner-actions"><button class="range-btn" onclick="cancelRangeMode()">취소</button><button class="range-btn confirm" ' + (canConfirm ? '' : 'disabled') + ' onclick="confirmRange()">' + (canConfirm ? '등록' : '...') + '</button></div>';
-    list.appendChild(banner);
-  } else if (mine) {
-    const myCard = document.createElement('div');
-    myCard.className = 'my-reservation';
-    myCard.innerHTML = '<div class="my-reservation-info">✓ 내 약속 등록됨<small>' + formatHour(mine.startHour) + ' ~ ' + formatHour(mine.endHour) + '</small></div><button class="my-reservation-cancel" onclick="cancelMyReservation()">취소</button>';
-    list.appendChild(myCard);
-  } else {
-    const startBtn = document.createElement('button');
-    startBtn.className = 'start-join-btn';
-    startBtn.textContent = '🎈 갈게요 — 시간 선택하기';
-    startBtn.onclick = () => startRangeMode(item.itemId);
-    list.appendChild(startBtn);
-  }
 
   TIME_SLOTS.forEach(hour => {
     const past = !state.demoMode && hour < currentHour;
     const kids = kidsAtHourInItem(item, hour);
-    const hasKids = kids.length > 0;
+    const mineHere = kids.some(k => k.mine);
+    const conflict = !mineHere && findMyReservationAtHour(hour);
+    const blocked = past || !!conflict;
     const slot = document.createElement('div');
     let cls = 'timeslot';
-    if (hasKids) cls += ' has-kids';
+    if (mineHere) cls += ' mine';
+    else if (kids.length > 0) cls += ' has-kids';
     if (past) cls += ' past';
-    if (isRangeMode) {
-      cls += ' selecting';
-      if (past) cls += ' disabled-pick';
-      else if (state.rangeStart === hour) cls += ' range-start';
-      else if (state.rangeEnd === hour) cls += ' range-end';
-      else if (state.rangeStart !== null && state.rangeEnd !== null && hour > state.rangeStart && hour < state.rangeEnd) cls += ' range-middle';
-      else if (state.rangeStart !== null && state.rangeEnd === null) {
-        const maxEnd = state.rangeStart + MAX_HOURS - 1;
-        if (hour > state.rangeStart && hour > maxEnd) cls += ' disabled-pick';
-      }
-    }
+    if (blocked) cls += ' blocked';
     slot.className = cls;
-    const period = hour < 12 ? '오전' : '오후';
-    const displayHour = hour <= 12 ? hour : hour - 12;
-    const countCls = kids.length === 0 ? 'zero' : '';
-    const maxAvatars = 3;
-    const avatarsHtml = kids.slice(0, maxAvatars).map(k => {
-      const ac = k.mine ? 'me' : (k.gender === '남아' ? 'boy' : k.gender === '여아' ? 'girl' : '');
-      const ageLabel = k.age != null ? String(k.age) : '?';
-      return '<div class="ts-avatar ' + ac + '">' + escapeHtml(ageLabel) + '</div>';
+    const displayHour = hour <= 9 ? '0' + hour : '' + hour;
+    const chipsHtml = kids.map(k => {
+      const cc = k.mine ? 'me' : (k.gender === '남아' ? 'boy' : k.gender === '여아' ? 'girl' : '');
+      const label = k.mine ? '나' : (k.age != null ? k.age + '세' : '?');
+      return '<span class="kid-chip ' + cc + '">' + escapeHtml(label) + '</span>';
     }).join('');
-    const moreHtml = kids.length > maxAvatars ? '<div class="ts-avatar-more">+' + (kids.length - maxAvatars) + '</div>' : '';
-    slot.innerHTML = '<div class="ts-time"><span class="ts-time-period">' + period + '</span>' + displayHour + '시</div><div class="ts-info"><div class="ts-count ' + countCls + '">' + kids.length + '명</div><div class="ts-avatars">' + avatarsHtml + moreHtml + '</div></div>';
-    if (hasKids && !isRangeMode) {
-      const detail = document.createElement('div');
-      detail.className = 'ts-detail';
-      kids.forEach(k => {
-        const chip = document.createElement('span');
-        chip.className = 'kid-chip' + (k.mine ? ' me' : '');
-        if (k.mine) chip.textContent = '나 (' + k.age + '세 ' + k.gender + ')';
-        else chip.textContent = k.age + '세 ' + k.gender + (k.verified ? ' ✓' : '');
-        detail.appendChild(chip);
-      });
-      slot.appendChild(detail);
+    const infoHtml = kids.length === 0 ? '<span class="ts-empty">—</span>' : chipsHtml;
+    let rightHtml = '';
+    if (mineHere) rightHtml = '<span class="ts-tag ts-tag--mine">갈게요</span>';
+    else if (past) rightHtml = '<span class="ts-tag ts-tag--mute">지남</span>';
+    else if (conflict) rightHtml = '<span class="ts-tag ts-tag--mute">겹침</span>';
+    slot.innerHTML = '<div class="ts-time">' + displayHour + '<span class="ts-time-suffix">시</span></div><div class="ts-info">' + infoHtml + '</div>' + rightHtml;
+    if (!blocked) {
       slot.style.cursor = 'pointer';
-      slot.addEventListener('click', () => slot.classList.toggle('expanded'));
-    }
-    if (isRangeMode && !past) {
-      slot.addEventListener('click', () => pickRangeSlot(hour));
+      slot.addEventListener('click', () => toggleHourReservation(item.itemId, hour));
     }
     list.appendChild(slot);
   });
 }
 
-function startRangeMode(itemId) {
-  if (!state.me) { showToast('먼저 닉네임을 설정해주세요'); openSetup(); return; }
-  const existing = findMyReservationAnywhere();
-  if (existing && existing.item.itemId !== itemId) {
-    showToast('이미 다른 놀이터에 약속이 있어요. 취소 후 등록해주세요');
-    return;
-  }
-  state.rangeMode = true;
-  state.rangeStart = null;
-  state.rangeEnd = null;
-  state.rangeForItemId = itemId;
-  const ctx = getCurrentItem();
-  if (ctx) renderTimeslots(ctx.item);
-}
-
-function pickRangeSlot(hour) {
-  if (state.rangeStart === null) {
-    state.rangeStart = hour;
-    state.rangeEnd = null;
-  } else if (state.rangeEnd === null) {
-    if (hour === state.rangeStart) {
-      state.rangeEnd = hour;
-    } else if (hour < state.rangeStart) {
-      state.rangeStart = hour;
-      state.rangeEnd = null;
-    } else {
-      const duration = hour - state.rangeStart + 1;
-      if (duration > MAX_HOURS) { showToast('최대 ' + MAX_HOURS + '시간까지 선택 가능해요'); return; }
-      state.rangeEnd = hour;
+function findMyReservationAtHour(hour) {
+  for (const g of state.groups) {
+    for (const it of g.items) {
+      const r = (it.reservations || []).find(rr => rr.mine && rr.startHour <= hour && rr.endHour > hour);
+      if (r) return { group: g, item: it, reservation: r };
     }
-  } else {
-    state.rangeStart = hour;
-    state.rangeEnd = null;
   }
-  const ctx = getCurrentItem();
-  if (ctx) renderTimeslots(ctx.item);
+  return null;
 }
 
-function confirmRange() {
-  if (state.rangeStart === null || state.rangeEnd === null) return;
+function toggleHourReservation(itemId, hour) {
+  if (!state.me) { showToast('먼저 닉네임을 설정해주세요'); openSetup(); return; }
   const ctx = getCurrentItem();
-  if (!ctx) return;
+  if (!ctx || ctx.item.itemId !== itemId) return;
   const item = ctx.item;
-  item.reservations = (item.reservations || []).filter(r => !r.mine);
-  item.reservations.push({
-    userId: 'me-' + Date.now(),
-    nickname: state.me.nickname, age: parseInt(state.me.age),
-    gender: state.me.gender, verified: state.me.verified, mine: true,
-    startHour: state.rangeStart, endHour: state.rangeEnd + 1,
-  });
-  showToast(formatHour(state.rangeStart) + ' ~ ' + formatHour(state.rangeEnd + 1) + ' 등록 완료!');
-  state.rangeMode = false;
-  state.rangeStart = null;
-  state.rangeEnd = null;
-  state.rangeForItemId = null;
+  const mineHere = (item.reservations || []).find(r => r.mine && r.startHour === hour && r.endHour === hour + 1);
+  if (mineHere) {
+    item.reservations = item.reservations.filter(r => r !== mineHere);
+    showToast(formatHour(hour) + ' 취소했어요');
+  } else {
+    const conflict = findMyReservationAtHour(hour);
+    if (conflict) {
+      const where = conflict.item.itemId === itemId ? '이 놀이터' : '다른 놀이터';
+      showToast(formatHour(hour) + '에 ' + where + ' 약속이 있어요');
+      return;
+    }
+    item.reservations = item.reservations || [];
+    item.reservations.push({
+      userId: 'me-' + Date.now(),
+      nickname: state.me.nickname, age: parseInt(state.me.age),
+      gender: state.me.gender, verified: state.me.verified, mine: true,
+      startHour: hour, endHour: hour + 1,
+    });
+    showToast(formatHour(hour) + ' 등록 완료!');
+  }
   renderTimeslots(item);
   renderMarkers();
   renderList();
   updateItemSummary(item);
 }
 
-function cancelRangeMode() {
-  state.rangeMode = false;
-  state.rangeStart = null;
-  state.rangeEnd = null;
-  state.rangeForItemId = null;
-  const ctx = getCurrentItem();
-  if (ctx) renderTimeslots(ctx.item);
-}
-
-function cancelMyReservation() {
-  const ctx = getCurrentItem();
-  if (!ctx) return;
-  ctx.item.reservations = (ctx.item.reservations || []).filter(r => !r.mine);
-  showToast('약속이 취소되었어요');
-  renderTimeslots(ctx.item);
-  renderMarkers();
-  renderList();
-  updateItemSummary(ctx.item);
-}
-
 function closeModal() {
   document.getElementById('modalBackdrop').classList.remove('show');
   state.selectedGroupId = null;
   state.viewingItemId = null;
-  if (state.rangeMode) {
-    state.rangeMode = false;
-    state.rangeStart = null;
-    state.rangeEnd = null;
-    state.rangeForItemId = null;
-  }
 }
 
 function closeModalBackdrop(e) {
