@@ -28,7 +28,7 @@
 2. **✅ 새로 만들 때는 빈 파일로 시작 (`> file`) 후 청크 단위 append**
    - 잘린 파일에 덧붙이지 말고, 처음부터 새로 쓰기
 
-3. **✅ 청크 추가 후 매번 검증 — 4가지 체크**
+3. **✅ 청크 추가 후 매번 검증 — 5가지 체크 (함수 중복 검사 필수!)**
    ```bash
    # JS syntax (인라인 script 부분)
    node -e "const html=...; const code=html.substring(...); new vm.Script(code)"
@@ -44,6 +44,13 @@
 
    # 파일이 끝까지 정상 (마지막 줄이 </html>)
    tail -3 file
+
+   # 함수 중복 정의 검사 — 이게 빠지면 화면에 코드 노출 발생
+   // 모든 핵심 함수가 정확히 1번만 정의되었는지 확인
+   for fn in functionNames {
+     const c = (code.match(new RegExp('function ' + fn + '\\\\b', 'g')) || []).length;
+     if (c !== 1) FAIL;
+   }
    ```
 
 4. **✅ 작은 수정만 Edit 사용** — 5~10줄 이내 변경

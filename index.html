@@ -15,8 +15,8 @@ body { display: flex; justify-content: center; }
 .me-badge { background: #fff; border: 1px solid #e5e5e5; border-radius: 20px; padding: 6px 12px; font-size: 12px; color: #555; cursor: pointer; }
 .search-bar { margin-top: 10px; background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 10px 14px; font-size: 13px; color: #888; }
 #map { width: 100%; height: 100%; background: #e8eef0; }
-.playground-flag { position: relative; cursor: pointer; transform: translate(-50%, -100%); }
-.flag-bubble { background: #ff5a5f; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 700; white-space: nowrap; min-width: 56px; text-align: center; border: 2px solid #fff; position: relative; }
+.playground-flag { position: relative; cursor: pointer; padding-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+.flag-bubble { background: #ff5a5f; color: #fff; padding: 6px 12px; border-radius: 14px; font-size: 13px; font-weight: 700; white-space: nowrap; min-width: 50px; text-align: center; border: 2px solid #fff; position: relative; } .flag-bubble::after { content: ""; position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%); width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 8px solid #fff; } .flag-bubble::before { content: ""; position: absolute; left: 50%; bottom: -3px; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #ff5a5f; z-index: 1; } .flag-bubble.few::before { border-top-color: #4a90e2; } .flag-bubble.empty::before { border-top-color: #aaa; } .flag-bubble.lots::before { border-top-color: #ff3b30; }
 .flag-bubble.few { background: #4a90e2; }
 .flag-bubble.empty { background: #aaa; }
 .flag-bubble.lots { background: #ff3b30; }
@@ -479,7 +479,7 @@ function renderMarkers() {
     const el = document.createElement('div');
     el.className = 'playground-flag';
     const groupBadge = group.items.length >= 2 ? '<span class="group-count">' + group.items.length + '</span>' : '';
-    el.innerHTML = '<div class="flag-bubble ' + cls + '">' + (total === 0 ? '0명' : total + '명') + groupBadge + '</div><div class="flag-pole"></div><div class="flag-dot"></div>';
+    el.innerHTML = '<div class="flag-bubble ' + cls + '">' + (total === 0 ? '0명' : total + '명') + groupBadge + '</div>';
     el.addEventListener('click', () => openGroupModal(group.id));
     const overlay = new kakao.maps.CustomOverlay({
       position: new kakao.maps.LatLng(group.lat, group.lng), content: el, yAnchor: 1, xAnchor: 0.5
