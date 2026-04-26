@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>오늘의놀이터</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>오늘의 놀이터</title>
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
 :root {
@@ -39,11 +39,14 @@
 html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f5f5f5; }
 body { display: flex; justify-content: center; }
 .app { width: 100%; max-width: 430px; height: 100vh; background: #fff; position: relative; overflow: hidden; }
-.header { position: absolute; top: 0; left: 0; right: 0; z-index: 10; padding: 14px 16px 12px; background: rgba(255,255,255,0.95); }
-.header-row { display: flex; align-items: center; justify-content: space-between; }
-.title { font-size: 18px; font-weight: 700; color: #222; }
-.me-badge { background: #fff; border: 1px solid #e5e5e5; border-radius: 20px; padding: 6px 12px; font-size: 12px; color: #555; cursor: pointer; }
-.search-bar { margin-top: 10px; background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 10px 14px; font-size: 13px; color: #888; }
+.header { position: absolute; top: 0; left: 0; right: 0; z-index: 10; padding: calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 12px calc(16px + env(safe-area-inset-left)); background: var(--c-cream); border-bottom: 1px solid var(--c-line-soft); display: flex; flex-direction: column; gap: 10px; }
+.header-row { display: flex; align-items: center; gap: 10px; }
+.title { font-size: var(--t-lg); font-weight: var(--w-b); letter-spacing: -0.02em; color: var(--c-ink); display: flex; align-items: center; gap: 8px; }
+.brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-coral); display: inline-block; }
+.me-badge { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 6px; background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-pill); font-size: var(--t-sm); font-weight: var(--w-m); color: var(--c-ink-2); cursor: pointer; }
+.me-badge .me-avatar { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #FFD8A8, #FFB088); display: grid; place-items: center; font-size: 12px; }
+.search { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-md); color: var(--c-ink-3); font-size: var(--t-sm); font-weight: var(--w-m); cursor: pointer; }
+.search svg { flex-shrink: 0; color: var(--c-ink-3); }
 #map { width: 100%; height: 100%; background: #e8eef0; }
 .playground-flag { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .playground-flag:active { transform: scale(0.92); }
@@ -54,7 +57,7 @@ body { display: flex; justify-content: center; }
 .flag-bubble.lots { background: var(--pin-busy); }
 .flag-bubble .group-count { background: rgba(255,255,255,0.25); padding: 1px 5px; border-radius: var(--r-pill); font-size: 10px; font-weight: var(--w-b); color: #fff; position: static; border: none; }
 .me-marker { width: 18px; height: 18px; background: #007aff; border: 3px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); }
-.bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: var(--c-card); border-top-left-radius: var(--r-2xl); border-top-right-radius: var(--r-2xl); box-shadow: var(--sh-modal); z-index: 5; max-height: 50%; display: flex; flex-direction: column; overflow: hidden; }
+.bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: var(--c-card); border-top-left-radius: var(--r-2xl); border-top-right-radius: var(--r-2xl); box-shadow: var(--sh-modal); z-index: 5; max-height: 50%; display: flex; flex-direction: column; overflow: hidden; padding-bottom: env(safe-area-inset-bottom); }
 .sheet-handle { width: 36px; height: 4px; background: var(--c-ink-4); border-radius: 2px; margin: 8px auto 4px; }
 .sheet-header { padding: 8px 20px 12px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .sheet-title { font-size: var(--t-lg); font-weight: var(--w-b); color: var(--c-ink); letter-spacing: -0.01em; }
@@ -71,7 +74,7 @@ body { display: flex; justify-content: center; }
 .pg-card .group-badge { background: var(--c-coral-soft); color: var(--c-coral-deep); padding: 1px 6px; border-radius: var(--r-pill); font-size: var(--t-xs); font-weight: var(--w-b); margin-left: 0; vertical-align: baseline; flex-shrink: 0; }
 .modal-backdrop { position: absolute; inset: 0; background: rgba(40, 30, 20, 0.45); z-index: 20; display: none; align-items: flex-end; justify-content: center; }
 .modal-backdrop.show { display: flex; }
-.modal { background: var(--c-card); width: 100%; border-top-left-radius: var(--r-2xl); border-top-right-radius: var(--r-2xl); max-height: 92%; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--sh-modal); animation: modalSlideUp 0.22s ease-out; }
+.modal { background: var(--c-card); width: 100%; border-top-left-radius: var(--r-2xl); border-top-right-radius: var(--r-2xl); max-height: 92%; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--sh-modal); animation: modalSlideUp 0.22s ease-out; padding-bottom: env(safe-area-inset-bottom); }
 @keyframes modalSlideUp { from { transform: translateY(20%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .modal-header { padding: 20px 20px 18px; background: linear-gradient(180deg, var(--c-coral-soft) 0%, var(--c-cream) 100%); position: relative; }
 .modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: var(--c-bg); border: none; border-radius: 50%; font-size: 18px; cursor: pointer; color: var(--c-ink-2); display: grid; place-items: center; }
@@ -113,7 +116,8 @@ body { display: flex; justify-content: center; }
 .group-list-stats.empty { background: var(--c-bg); color: var(--c-ink-3); }
 .onboard { position: absolute; inset: 0; background: var(--c-cream); z-index: 30; display: none; flex-direction: column; }
 .onboard.show { display: flex; }
-.onboard-body { flex: 1; overflow-y: auto; padding: 48px 24px 24px; }
+.onboard-body { flex: 1; overflow-y: auto; padding: calc(48px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) 24px calc(24px + env(safe-area-inset-left)); }
+.onboard-footer { padding-bottom: calc(18px + env(safe-area-inset-bottom)) !important; }
 .onboard-back { background: none; border: none; padding: 8px; margin-left: -8px; margin-bottom: 8px; color: var(--c-ink); cursor: pointer; font-size: 20px; line-height: 1; }
 .onboard-title { font-size: var(--t-3xl); font-weight: var(--w-b); color: var(--c-ink); letter-spacing: -0.02em; line-height: 1.2; margin: 0 0 8px; }
 .onboard-title.sub { font-size: var(--t-2xl); line-height: 1.25; margin-bottom: 6px; }
@@ -156,10 +160,50 @@ body { display: flex; justify-content: center; }
 .btn-coral:disabled { background: var(--c-ink-4); }
 .btn-lg { padding: 16px 24px; font-size: var(--t-lg); border-radius: var(--r-lg); }
 .btn-block { width: 100%; }
-.toast { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #fff; padding: 10px 16px; border-radius: 20px; font-size: 13px; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.btn-ghost { background: var(--c-card); color: var(--c-ink); border: 1px solid var(--c-line); }
+.page { position: absolute; inset: 0; background: var(--c-cream); z-index: 25; display: none; flex-direction: column; animation: pageSlideIn 0.22s ease-out; }
+.page.show { display: flex; }
+@keyframes pageSlideIn { from { transform: translateX(20%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.page-header { display: flex; align-items: center; padding: calc(8px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) 8px calc(4px + env(safe-area-inset-left)); gap: 4px; background: var(--c-cream); border-bottom: 1px solid var(--c-line-soft); position: relative; z-index: 2; }
+.page-back { width: 40px; height: 40px; display: grid; place-items: center; color: var(--c-ink); background: none; border: none; font-size: 20px; cursor: pointer; }
+.page-title { font-size: var(--t-lg); font-weight: var(--w-b); color: var(--c-ink); flex: 1; }
+.page-body { flex: 1; overflow-y: auto; }
+.profile-card { padding: 20px 20px 24px; background: linear-gradient(180deg, var(--c-coral-soft) 0%, var(--c-cream) 100%); display: flex; align-items: center; gap: 14px; }
+.profile-avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #FFD8A8, #FFB088); display: grid; place-items: center; font-size: 28px; flex-shrink: 0; }
+.profile-info { flex: 1; min-width: 0; }
+.profile-name { font-size: var(--t-xl); font-weight: var(--w-b); letter-spacing: -0.02em; color: var(--c-ink); }
+.profile-meta { font-size: var(--t-sm); color: var(--c-ink-2); margin-top: 2px; font-weight: var(--w-m); }
+.profile-edit { padding: 8px 12px; font-size: var(--t-sm); font-weight: var(--w-sb); color: var(--c-ink-2); background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-pill); cursor: pointer; flex-shrink: 0; }
+.promise-card { margin: 12px 16px; padding: 16px; background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+.promise-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: #E8F7F0; color: var(--c-good); border-radius: var(--r-pill); font-size: var(--t-xs); font-weight: var(--w-b); margin-bottom: 8px; }
+.promise-status .dot-good { width: 6px; height: 6px; border-radius: 50%; background: var(--c-good); }
+.promise-when { font-size: var(--t-xl); font-weight: var(--w-b); color: var(--c-ink); letter-spacing: -0.02em; }
+.promise-where { font-size: var(--t-sm); color: var(--c-ink-2); margin-top: 4px; font-weight: var(--w-m); }
+.promise-actions { display: flex; gap: 8px; margin-top: 14px; }
+.promise-empty { margin: 12px 16px; padding: 24px 16px; background: var(--c-card); border: 1px dashed var(--c-line); border-radius: var(--r-lg); text-align: center; font-size: var(--t-sm); color: var(--c-ink-3); font-weight: var(--w-m); }
+.list-item { display: flex; align-items: center; padding: 14px 20px; gap: 12px; border-bottom: 1px solid var(--c-line-soft); cursor: pointer; transition: background 0.12s; }
+.list-item:active { background: var(--c-bg); }
+.list-item:last-child { border-bottom: none; }
+.list-item-icon { width: 36px; height: 36px; border-radius: var(--r-md); display: grid; place-items: center; flex-shrink: 0; background: var(--c-bg); color: var(--c-ink-2); font-size: 16px; }
+.list-item-icon.demo { background: #FFF1D6; color: #B5751B; }
+.list-item-text { flex: 1; min-width: 0; }
+.list-item-title { font-size: var(--t-md); font-weight: var(--w-sb); color: var(--c-ink); }
+.list-item-sub { font-size: var(--t-sm); color: var(--c-ink-3); margin-top: 2px; line-height: 1.4; }
+.toggle-switch { flex-shrink: 0; width: 44px; height: 26px; border-radius: 13px; background: var(--c-line); position: relative; transition: background 0.15s; }
+.toggle-switch.on { background: var(--c-good); }
+.toggle-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: left 0.15s; }
+.toggle-switch.on::after { left: 21px; }
+.list-item-arrow { flex-shrink: 0; font-size: 18px; color: var(--c-ink-4); }
+.safety-list { margin: 8px 0 0; padding: 0 20px 0 40px; counter-reset: safety; list-style: none; }
+.safety-list li { position: relative; padding: 12px 0 12px 4px; border-bottom: 1px solid var(--c-line-soft); font-size: var(--t-md); color: var(--c-ink-2); line-height: 1.55; counter-increment: safety; font-weight: var(--w-m); }
+.safety-list li:last-child { border-bottom: none; }
+.safety-list li::before { content: counter(safety); position: absolute; left: -24px; top: 13px; width: 22px; height: 22px; border-radius: 50%; background: var(--c-coral-soft); color: var(--c-coral-deep); display: grid; place-items: center; font-size: var(--t-xs); font-weight: var(--w-b); }
+.safety-list li strong { color: var(--c-ink); font-weight: var(--w-b); }
+.toast { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(40, 30, 20, 0.92); color: #fff; padding: 12px 20px; border-radius: var(--r-pill); font-size: var(--t-sm); font-weight: var(--w-m); z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s; box-shadow: var(--sh-3); white-space: nowrap; }
 .toast.show { opacity: 1; }
-.map-controls { position: absolute; right: 12px; bottom: calc(45% + 12px); z-index: 4; display: flex; flex-direction: column; gap: 8px; }
-.map-btn { width: 42px; height: 42px; background: #fff; border: none; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; font-size: 18px; }
+.map-controls { position: absolute; right: 12px; bottom: calc(50% + 12px); z-index: 4; display: flex; flex-direction: column; gap: 8px; }
+.map-btn { width: 44px; height: 44px; background: var(--c-card); border: 1px solid var(--c-line-soft); border-radius: 50%; box-shadow: var(--sh-2); cursor: pointer; font-size: 18px; color: var(--c-ink-2); display: grid; place-items: center; }
+.map-btn:active { background: var(--c-bg); }
 </style>
 <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=298aeb2bbbab45bba43939a427b6b381&libraries=services" onerror="window.__kakaoLoadFailed=true"></script>
 </head>
@@ -167,20 +211,80 @@ body { display: flex; justify-content: center; }
 <div class="app">
 <div class="header">
 <div class="header-row">
-<div class="title">🛝 오늘의놀이터</div>
-<div class="me-badge" id="meBadge" onclick="openSetup()"><span id="meIcon">👤</span> <span id="meName">설정하기</span></div>
+<div class="title"><span class="brand-dot"></span>오늘의 놀이터</div>
+<div class="me-badge" id="meBadge" onclick="openMePage()"><span class="me-avatar" id="meIcon">👤</span><span id="meName">설정하기</span></div>
 </div>
-<div class="search-bar" onclick="toggleDemoMode()" style="cursor:pointer;"><span id="demoBadge">🧪 데모 모드 (탭하여 끄기)</span></div>
+<div class="search" onclick="showToast('검색은 곧 지원될 예정이에요')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="5"/><path d="M11 11 L14 14" stroke-linecap="round"/></svg><span>동네·아파트·놀이터 검색</span></div>
 </div>
 <div id="map"></div>
 <div class="map-controls">
-<button class="map-btn" onclick="centerToMe()">📍</button>
-<button class="map-btn" onclick="refreshData()">🔄</button>
+<button class="map-btn" onclick="centerToMe()" aria-label="현위치"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2 v3 M12 19 v3 M2 12 h3 M19 12 h3"/></svg></button>
+<button class="map-btn" onclick="refreshData()" aria-label="새로고침"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 a9 9 0 0 1 15.5 -6.3 L21 8"/><path d="M21 3 v5 h-5"/><path d="M21 12 a9 9 0 0 1 -15.5 6.3 L3 16"/><path d="M3 21 v-5 h5"/></svg></button>
 </div>
 <div class="bottom-sheet">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><div class="sheet-title">근처 놀이터</div><div class="sheet-meta" id="sheetCount">0곳</div></div>
 <div class="sheet-list" id="sheetList"></div>
+</div>
+<div class="page" id="mePage">
+<div class="page-header">
+<button class="page-back" onclick="closeMePage()" aria-label="뒤로">←</button>
+<div class="page-title">내 정보</div>
+</div>
+<div class="page-body">
+<div class="profile-card">
+<div class="profile-avatar" id="meProfileAvatar">🙂</div>
+<div class="profile-info">
+<div class="profile-name" id="meProfileName">—</div>
+<div class="profile-meta" id="meProfileMeta">—</div>
+</div>
+<button class="profile-edit" onclick="openSetup()">수정</button>
+</div>
+<div class="section-title">오늘 내 약속</div>
+<div id="myPromiseList"></div>
+<div class="section-title">도움</div>
+<div class="list-item" onclick="openSafetyPage()">
+<div class="list-item-icon">🛡️</div>
+<div class="list-item-text">
+<div class="list-item-title">안전수칙 다시 보기</div>
+<div class="list-item-sub">우리 아이 보호를 위한 8가지</div>
+</div>
+<div class="list-item-arrow" style="color:var(--c-ink-4);">›</div>
+</div>
+<div class="list-item" id="demoToggleItem" onclick="toggleDemoMode()">
+<div class="list-item-icon demo">🧪</div>
+<div class="list-item-text">
+<div class="list-item-title">데모 모드</div>
+<div class="list-item-sub" id="demoSwitchSub">예시 데이터로 둘러보는 중. 탭하여 끄기</div>
+</div>
+<div class="toggle-switch on" id="demoSwitch"></div>
+</div>
+</div>
+</div>
+<div class="page" id="safetyPage">
+<div class="page-header">
+<button class="page-back" onclick="closeSafetyPage()" aria-label="뒤로">←</button>
+<div class="page-title">안전수칙</div>
+</div>
+<div class="page-body">
+<div style="padding:20px 20px 8px;">
+<div style="font-size:var(--t-2xl);font-weight:var(--w-b);color:var(--c-ink);letter-spacing:-0.02em;line-height:1.25;">우리 아이 보호를 위한 8가지</div>
+<div style="font-size:var(--t-sm);color:var(--c-ink-2);margin-top:6px;font-weight:var(--w-m);line-height:1.55;">처음 만나는 부모와 아이는 모두 익명이에요. 약속 전에 한 번 더 확인해주세요.</div>
+</div>
+<ol class="safety-list">
+<li><strong>아이를 혼자 두지 마세요.</strong> 약속 시간 동안에는 항상 보호자가 함께해야 해요.</li>
+<li><strong>실명·연락처를 묻지도, 알려주지도 마세요.</strong> 닉네임만으로 충분해요.</li>
+<li><strong>아이 사진·동영상 촬영 금지.</strong> 다른 아이가 함께 찍히는 상황도 피해주세요.</li>
+<li><strong>아이의 학교·학원·집 위치를 알려주지 마세요.</strong> 동네 단위까지만.</li>
+<li><strong>음식·간식·선물을 주고받지 마세요.</strong> 알레르기·질병 사고 위험이 있어요.</li>
+<li><strong>아이 단독 SNS·카톡 친구 추가 금지.</strong> 부모끼리도 신중하게.</li>
+<li><strong>위험한 행동을 보면 바로 자리를 옮겨주세요.</strong> 갈등 상황은 피하는 게 우선이에요.</li>
+<li><strong>긴급 상황은 즉시 112.</strong> 앱 안에서 해결하려 하지 마세요.</li>
+</ol>
+<div style="padding:14px 20px 28px;font-size:var(--t-xs);color:var(--c-ink-3);line-height:1.6;">
+오늘의 놀이터는 매칭만 도와드려요. 아이 안전의 책임은 보호자에게 있습니다.
+</div>
+</div>
 </div>
 <div class="modal-backdrop" id="modalBackdrop" onclick="closeModalBackdrop(event)">
 <div class="modal" onclick="event.stopPropagation()">
@@ -218,7 +322,7 @@ body { display: flex; justify-content: center; }
 <button class="btn btn-primary btn-lg btn-block" onclick="onboardGo(1)">시작하기</button>
 </div>
 <div id="onboardStep1" style="display:none;">
-<button class="onboard-back" onclick="onboardGo(0)" aria-label="이전">←</button>
+<button class="onboard-back" onclick="onboardBack()" aria-label="이전">←</button>
 <div class="onboard-title sub">먼저 동의해 주세요</div>
 <div class="onboard-desc muted">안전한 만남을 위해 모두 필수예요</div>
 <div class="check check-master" id="agreeAll" onclick="onboardToggleAll()"><div class="check-box">✓</div><div class="check-text bold">전체 동의</div></div>
@@ -229,7 +333,7 @@ body { display: flex; justify-content: center; }
 <div style="margin-top:24px;"><button class="btn btn-primary btn-lg btn-block" id="agreeNextBtn" onclick="onboardGo(2)" disabled>다음</button></div>
 </div>
 <div id="onboardStep2" style="display:none;">
-<button class="onboard-back" onclick="onboardGo(1)" aria-label="이전">←</button>
+<button class="onboard-back" onclick="onboardBack()" aria-label="이전">←</button>
 <div class="onboard-title sub">어떻게 불러드릴까요?</div>
 <div class="onboard-desc muted">실명은 노출되지 않아요. 가명을 추천드려요.</div>
 <div class="field"><label class="field-label">닉네임</label><input class="field-input" id="inputNickname" placeholder="예: 해온맘" maxlength="10" oninput="onboardCheckNick()"/><div class="field-hint">2~10자</div></div>
@@ -270,6 +374,14 @@ function onboardGo(step) {
     document.getElementById('dot' + i).classList.toggle('active', i === step);
   }
   if (step === 2) renderAgeGrid();
+}
+
+function onboardBack() {
+  if (state.me) {
+    document.getElementById('setupModal').classList.remove('show');
+    return;
+  }
+  if (onboard.step > 0) onboardGo(onboard.step - 1);
 }
 
 function onboardToggleOne(key) {
@@ -359,7 +471,70 @@ function openSetup() {
 function updateMeBadge() {
   if (!state.me) return;
   document.getElementById('meName').textContent = state.me.nickname + ' (' + state.me.age + '세 ' + state.me.gender + ')';
-  document.getElementById('meIcon').textContent = state.me.verified ? '✅' : '👤';
+  document.getElementById('meIcon').textContent = state.me.verified ? '✅' : '🙂';
+}
+
+function openMePage() {
+  if (!state.me) { openSetup(); return; }
+  document.getElementById('meProfileName').textContent = state.me.nickname;
+  document.getElementById('meProfileMeta').textContent = '아이 ' + state.me.age + '세 · ' + state.me.gender;
+  renderMyPromises();
+  syncDemoToggleUI();
+  document.getElementById('mePage').classList.add('show');
+}
+
+function closeMePage() {
+  document.getElementById('mePage').classList.remove('show');
+}
+
+function openSafetyPage() {
+  document.getElementById('safetyPage').classList.add('show');
+}
+
+function closeSafetyPage() {
+  document.getElementById('safetyPage').classList.remove('show');
+}
+
+function renderMyPromises() {
+  const list = document.getElementById('myPromiseList');
+  list.innerHTML = '';
+  const byItem = new Map();
+  state.groups.forEach(g => g.items.forEach(it => {
+    const mine = (it.reservations || []).filter(r => r.mine).map(r => r.startHour).sort((a, b) => a - b);
+    if (mine.length) byItem.set(it.itemId, { group: g, item: it, hours: mine });
+  }));
+  if (byItem.size === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'promise-empty';
+    empty.textContent = '오늘 등록한 약속이 없어요';
+    list.appendChild(empty);
+    return;
+  }
+  byItem.forEach(({ group, item, hours }) => {
+    const card = document.createElement('div');
+    card.className = 'promise-card';
+    const hoursText = hours.map(h => formatHour(h)).join(', ');
+    card.innerHTML = '<div class="promise-status"><span class="dot-good"></span>예정</div>'
+      + '<div class="promise-when">오늘 ' + escapeHtml(hoursText) + '</div>'
+      + '<div class="promise-where">' + escapeHtml(group.title + ' · ' + (item.n || '')) + '</div>'
+      + '<div class="promise-actions">'
+      + '<button class="btn btn-ghost" data-action="view">지도에서 보기</button>'
+      + '<button class="btn btn-ghost" data-action="cancel" style="color:var(--c-danger);">전부 취소</button>'
+      + '</div>';
+    card.querySelector('[data-action="view"]').addEventListener('click', () => {
+      closeMePage();
+      openGroupModal(group.id);
+    });
+    card.querySelector('[data-action="cancel"]').addEventListener('click', () => {
+      item.reservations = (item.reservations || []).filter(r => !r.mine);
+      showToast(item.n + ' 약속 전부 취소했어요');
+      renderMarkers(); renderList();
+      const ctx = getCurrentItem();
+      if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
+      renderMyPromises();
+    });
+    list.appendChild(card);
+  });
 }
 
 function initLocation() {
@@ -823,12 +998,23 @@ function closeModalBackdrop(e) {
 
 function toggleDemoMode() {
   state.demoMode = !state.demoMode;
-  document.getElementById('demoBadge').textContent = state.demoMode ? '🧪 데모 모드 (탭하여 끄기)' : '✅ 실제 모드';
-  state.groups.forEach(g => g.items.forEach(it => { it.reservations = generateMockReservations(); }));
+  if (state.demoMode) {
+    state.groups.forEach(g => g.items.forEach(it => { it.reservations = generateMockReservations(); }));
+  } else {
+    state.groups.forEach(g => g.items.forEach(it => { it.reservations = []; }));
+  }
   renderMarkers();
   renderList();
   const ctx = getCurrentItem();
   if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
+  syncDemoToggleUI();
+}
+
+function syncDemoToggleUI() {
+  const sw = document.getElementById('demoSwitch');
+  if (sw) sw.classList.toggle('on', state.demoMode);
+  const sub = document.getElementById('demoSwitchSub');
+  if (sub) sub.textContent = state.demoMode ? '예시 데이터로 둘러보는 중. 탭하여 끄기' : '실제 정보 사용 중. 탭하여 데모 데이터 보기';
 }
 
 function refreshData() {
