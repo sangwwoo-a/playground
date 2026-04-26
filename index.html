@@ -348,12 +348,37 @@ function buildAllGroups(playgrounds) {
 async function loadFromJson() {
   try {
     if (!state.allGroups) {
-      const res = await fetch('./playgrounds.json', { cache: 'force-cache' });
-      if (!res.ok) throw new Error('JSON not found');
-      state.allPlaygrounds = await res.json();
-      console.log('[데이터] 원본:', state.allPlaygrounds.length, '곳');
-      state.allGroups = buildAllGroups(state.allPlaygrounds);
-      console.log('[데이터] 그룹:', state.allGroups.length, '개');
+      // 우선 사전 처리된 그룹 데이터(playgrounds-geo.json) 시도
+      let res = await fetch('./playgrounds-geo.json', { cache: 'force-cache' });
+      if (res.ok) {
+        const rawGroups = await res.json();
+        console.log('[데이터] 그룹화+지오코딩:', rawGroups.length, '그룹');
+        // 새 구조: 이미 그룹화 + 카카오 정확 좌표
+        // {k,t,a,y,x,s,i:[{n,a,y,x}]}
+        state.allGroups = rawGroups.map((g, idx) => ({
+          id: 'g-' + idx,
+          key: g.k,
+          title: g.t,
+          addr: g.a,
+          lat: g.y,
+          lng: g.x,
+          src: g.s,
+          items: g.i.map((p, i) => ({
+            itemId: 'item-' + idx + '-' + i,
+            n: p.n, a: p.a, y: p.y, x: p.x,
+            reservations: [],
+          })),
+        }));
+      } else {
+        // Fallback: 옛 평탄 데이터 + 클라이언트 그룹화
+        console.warn('[데이터] playgrounds-geo.json 없음, 평탄 데이터로 fallback');
+        res = await fetch('./playgrounds.json', { cache: 'force-cache' });
+        if (!res.ok) throw new Error('JSON not found');
+        state.allPlaygrounds = await res.json();
+        console.log('[데이터] 원본:', state.allPlaygrounds.length, '곳');
+        state.allGroups = buildAllGroups(state.allPlaygrounds);
+        console.log('[데이터] 그룹:', state.allGroups.length, '개');
+      }
     }
     filterAndDisplay();
   } catch (e) {
@@ -771,6 +796,42 @@ function toggleDemoMode() {
 
 function refreshData() {
   state.groups.forEach(g => g.items.forEach(it => { it.reservations = generateMockReservations(); }));
+  renderMarkers();
+  renderList();
+  const ctx = getCurrentItem();
+  if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
+  showToast('새로고침 완료');
+}
+
+function formatHour(hour) {
+  if (hour < 12) return '오전 ' + hour + '시';
+  if (hour === 12) return '오후 12시';
+  if (hour === 24) return '자정';
+  return '오후 ' + (hour - 12) + '시';
+}
+
+function dist(a, b) {
+  const dx = (a.lng - b.lng) * 88;
+  const dy = (a.lat - b.lat) * 111;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>
+s.forEach(it => { it.reservations = generateMockReservations(); }));
   renderMarkers();
   renderList();
   const ctx = getCurrentItem();
