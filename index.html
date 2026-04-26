@@ -271,14 +271,9 @@ function initMap() {
   });
 }
 
-// ===== 그룹화 알고리즘 =====
-
 function groupKey(addr) {
   if (!addr) return null;
-  let s = addr
-    .replace(/\s*[\(（][^\)）]*[\)）]\s*$/, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  let s = addr.replace(/\s*[\(（][^\)）]*[\)）]\s*$/, '').replace(/\s+/g, ' ').trim();
   const tokens = s.split(' ');
   let roadIdx = -1;
   for (let i = tokens.length - 1; i >= 0; i--) {
@@ -289,9 +284,7 @@ function groupKey(addr) {
     return tokens.slice(0, roadIdx + 1).join(' ') + ' ' + numToken;
   }
   if (roadIdx === tokens.length - 1) return s;
-  while (tokens.length > 0 && /^\d+(-\d+)?$/.test(tokens[tokens.length - 1])) {
-    tokens.pop();
-  }
+  while (tokens.length > 0 && /^\d+(-\d+)?$/.test(tokens[tokens.length - 1])) tokens.pop();
   return tokens.join(' ');
 }
 
@@ -316,8 +309,7 @@ function groupTitle(items, addr) {
     if (names.every(n => n[i] === ch)) common += ch;
     else break;
   }
-  common = common.replace(/[\s·\-,]+$/, '').trim();
-  common = common.replace(/\s+\d+$/, '').trim();
+  common = common.replace(/[\s·\-,]+$/, '').trim().replace(/\s+\d+$/, '').trim();
   if (common.length > 5) return common;
   return (addr || '').replace(/\s*\(.*?\)\s*$/, '');
 }
@@ -359,9 +351,9 @@ async function loadFromJson() {
       const res = await fetch('./playgrounds.json', { cache: 'force-cache' });
       if (!res.ok) throw new Error('JSON not found');
       state.allPlaygrounds = await res.json();
-      console.log('[데이터] 원본 로드:', state.allPlaygrounds.length, '곳');
+      console.log('[데이터] 원본:', state.allPlaygrounds.length, '곳');
       state.allGroups = buildAllGroups(state.allPlaygrounds);
-      console.log('[데이터] 그룹화 결과:', state.allGroups.length, '그룹');
+      console.log('[데이터] 그룹:', state.allGroups.length, '개');
     }
     filterAndDisplay();
   } catch (e) {
@@ -385,8 +377,7 @@ function filterAndDisplay() {
   if (state.groups.length === 0) {
     const fallback = state.allGroups
       .map(g => ({ g, d: dist(me, { lat: g.lat, lng: g.lng }) }))
-      .sort((a, b) => a.d - b.d)
-      .slice(0, 30);
+      .sort((a, b) => a.d - b.d).slice(0, 30);
     state.groups = fallback.map(o => {
       o.g.items.forEach(it => { it.reservations = generateMockReservations(); });
       return o.g;
@@ -441,6 +432,16 @@ function countItemTotal(item) {
 
 function countGroupTotal(group) {
   return group.items.reduce((sum, it) => sum + countItemTotal(it), 0);
+}
+
+function findMyReservationAnywhere() {
+  for (const g of state.groups) {
+    for (const it of g.items) {
+      const mine = (it.reservations || []).find(r => r.mine);
+      if (mine) return { group: g, item: it, reservation: mine };
+    }
+  }
+  return null;
 }
 
 function renderMarkers() {
@@ -508,7 +509,7 @@ function showGroupListModal(group) {
     summaryEl.innerHTML = '🌱 이 단지의 ' + group.items.length + '곳 놀이터에 아직 예약이 없어요';
   } else {
     summaryEl.className = 'modal-pg-summary';
-    summaryEl.innerHTML = '🎈 오늘 <b>' + total + '명</b> 예정 (' + group.items.length + '곳 놀이터 합계)';
+    summaryEl.innerHTML = '🎈 오늘 <b>' + total + '명</b> 예정 (' + group.items.length + '곳 합계)';
   }
   const body = document.getElementById('modalBody');
   body.innerHTML = '<div class="section-title">이 단지의 놀이터<span style="font-size:11px;color:#888;font-weight:400;">선택해서 약속 등록</span></div>';
@@ -635,7 +636,6 @@ function renderTimeslots(item) {
     const maxAvatars = 3;
     const avatarsHtml = kids.slice(0, maxAvatars).map(k => {
       const ac = k.mine ? 'me' : (k.gender === '남아' ? 'boy' : k.gender === '여아' ? 'girl' : '');
-      // 익명성 강화: 닉네임 첫 글자 대신 나이만 표시 (예: 5)
       const ageLabel = k.age != null ? String(k.age) : '?';
       return '<div class="ts-avatar ' + ac + '">' + escapeHtml(ageLabel) + '</div>';
     }).join('');
@@ -647,12 +647,8 @@ function renderTimeslots(item) {
       kids.forEach(k => {
         const chip = document.createElement('span');
         chip.className = 'kid-chip' + (k.mine ? ' me' : '');
-        // 익명성 강화: 닉네임 노출 안 함. 본인은 '나'로, 타인은 '나이+성별'만
-        if (k.mine) {
-          chip.textContent = '나 (' + k.age + '세 ' + k.gender + ')';
-        } else {
-          chip.textContent = k.age + '세 ' + k.gender + (k.verified ? ' ✓' : '');
-        }
+        if (k.mine) chip.textContent = '나 (' + k.age + '세 ' + k.gender + ')';
+        else chip.textContent = k.age + '세 ' + k.gender + (k.verified ? ' ✓' : '');
         detail.appendChild(chip);
       });
       slot.appendChild(detail);
@@ -666,19 +662,8 @@ function renderTimeslots(item) {
   });
 }
 
-function findMyReservationAnywhere() {
-  for (const g of state.groups) {
-    for (const it of g.items) {
-      const mine = (it.reservations || []).find(r => r.mine);
-      if (mine) return { group: g, item: it, reservation: mine };
-    }
-  }
-  return null;
-}
-
 function startRangeMode(itemId) {
   if (!state.me) { showToast('먼저 닉네임을 설정해주세요'); openSetup(); return; }
-  // 한 사람 한 약속 — 이미 다른 곳에 등록되어 있으면 차단
   const existing = findMyReservationAnywhere();
   if (existing && existing.item.itemId !== itemId) {
     showToast('이미 다른 놀이터에 약속이 있어요. 취소 후 등록해주세요');
@@ -790,38 +775,6 @@ function refreshData() {
   renderList();
   const ctx = getCurrentItem();
   if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
-  showToast('새로고침 완료');
-}
-
-function formatHour(hour) {
-  if (hour < 12) return '오전 ' + hour + '시';
-  if (hour === 12) return '오후 12시';
-  if (hour === 24) return '자정';
-  return '오후 ' + (hour - 12) + '시';
-}
-
-function dist(a, b) {
-  const dx = (a.lng - b.lng) * 88;
-  const dy = (a.lat - b.lat) * 111;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-function escapeHtml(s) {
-  return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-}
-
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
-}
-</script>
-</body>
-</html>
-enderTimeslots(ctx.item); updateItemSummary(ctx.item); }
   showToast('새로고침 완료');
 }
 
