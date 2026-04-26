@@ -111,22 +111,51 @@ body { display: flex; justify-content: center; }
 .group-list-name { font-size: var(--t-md); font-weight: var(--w-sb); color: var(--c-ink); flex: 1; line-height: 1.3; }
 .group-list-stats { flex-shrink: 0; font-size: var(--t-sm); font-weight: var(--w-b); color: var(--c-coral-deep); background: var(--c-coral-soft); padding: 6px 10px; border-radius: var(--r-sm); white-space: nowrap; }
 .group-list-stats.empty { background: var(--c-bg); color: var(--c-ink-3); }
-.setup-modal { position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 30; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.setup-card { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; }
-.setup-title { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
-.setup-desc { font-size: 13px; color: #888; margin: 0 0 16px; line-height: 1.5; }
-.setup-field { margin-bottom: 14px; }
-.setup-label { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 6px; display: block; }
-.setup-input, .setup-select { width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 8px; }
-.setup-btn { width: 100%; padding: 12px; background: #ff5a5f; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
-.setup-btn:disabled { background: #ddd; cursor: not-allowed; }
-.consent-section { background: #fff8f8; border: 1px solid #ffd9da; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
-.consent-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 12px; color: #555; line-height: 1.5; }
-.consent-row:last-child { margin-bottom: 0; }
-.consent-row label { flex: 1; cursor: pointer; }
-.required { color: #ff5a5f; font-weight: 700; }
-.user-info-card { background: #f0f9f0; border: 1px solid #a8e3ad; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 12px; color: #1b7a3a; }
-.step-indicator { font-size: 11px; color: #888; margin-bottom: 8px; }
+.onboard { position: absolute; inset: 0; background: var(--c-cream); z-index: 30; display: none; flex-direction: column; }
+.onboard.show { display: flex; }
+.onboard-body { flex: 1; overflow-y: auto; padding: 48px 24px 24px; }
+.onboard-back { background: none; border: none; padding: 8px; margin-left: -8px; margin-bottom: 8px; color: var(--c-ink); cursor: pointer; font-size: 20px; line-height: 1; }
+.onboard-title { font-size: var(--t-3xl); font-weight: var(--w-b); color: var(--c-ink); letter-spacing: -0.02em; line-height: 1.2; margin: 0 0 8px; }
+.onboard-title.sub { font-size: var(--t-2xl); line-height: 1.25; margin-bottom: 6px; }
+.onboard-desc { font-size: var(--t-md); color: var(--c-ink-2); margin: 0 0 32px; font-weight: var(--w-m); line-height: 1.55; }
+.onboard-desc.muted { color: var(--c-ink-3); font-size: var(--t-sm); margin-bottom: 20px; }
+.onboard-hero { display: grid; place-items: center; margin: 8px 0 28px; }
+.onboard-footer { display: flex; gap: 6px; justify-content: center; padding: 12px 0 18px; }
+.dot { width: 6px; height: 6px; border-radius: 3px; background: var(--c-line); transition: all 0.2s; }
+.dot.active { width: 20px; background: var(--c-ink); }
+.check { display: flex; align-items: flex-start; gap: 12px; padding: 14px 12px; border-radius: var(--r-md); cursor: pointer; transition: background 0.12s; }
+.check:active { background: var(--c-bg); }
+.check-master { background: var(--c-bg); margin-bottom: 8px; }
+.check-box { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--c-line); display: grid; place-items: center; flex-shrink: 0; transition: all 0.15s; background: #fff; color: #fff; font-size: 14px; line-height: 1; }
+.check.checked .check-box { background: var(--c-ink); border-color: var(--c-ink); }
+.check-text { flex: 1; font-size: var(--t-md); font-weight: var(--w-m); color: var(--c-ink); line-height: 1.4; padding-top: 1px; }
+.check-text.bold { font-weight: var(--w-b); }
+.check-text-required { color: var(--c-coral-deep); font-size: var(--t-xs); font-weight: var(--w-b); margin-right: 4px; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.field-label { font-size: var(--t-sm); font-weight: var(--w-sb); color: var(--c-ink-2); }
+.field-input { padding: 13px 14px; border: 1px solid var(--c-line); border-radius: var(--r-md); background: var(--c-card); font-size: var(--t-md); color: var(--c-ink); outline: none; transition: border-color 0.15s; font-family: inherit; }
+.field-input:focus { border-color: var(--c-ink); }
+.field-input::placeholder { color: var(--c-ink-4); }
+.field-hint { font-size: var(--t-xs); color: var(--c-ink-3); }
+.age-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.age-btn { padding: 10px 0; border-radius: var(--r-sm); border: 1px solid var(--c-line); background: var(--c-card); color: var(--c-ink); font-weight: var(--w-b); font-size: var(--t-sm); cursor: pointer; font-family: inherit; }
+.age-btn.active { border-color: var(--c-ink); background: var(--c-ink); color: #fff; }
+.seg { display: flex; background: var(--c-bg); border-radius: var(--r-md); padding: 3px; gap: 2px; }
+.seg-opt { flex: 1; padding: 10px 8px; text-align: center; font-size: var(--t-sm); font-weight: var(--w-sb); color: var(--c-ink-3); border-radius: 9px; transition: all 0.15s; cursor: pointer; }
+.seg-opt.active { background: var(--c-card); color: var(--c-ink); box-shadow: var(--sh-1); }
+.safety-tip { padding: 14px; background: var(--c-coral-soft); border-radius: var(--r-md); margin-top: 8px; margin-bottom: 20px; display: flex; gap: 10px; }
+.safety-tip-icon { color: var(--c-coral-deep); flex-shrink: 0; margin-top: 1px; font-size: 18px; line-height: 1; }
+.safety-tip-text { font-size: var(--t-sm); color: var(--c-ink-2); line-height: 1.5; font-weight: var(--w-m); }
+.safety-tip-text strong { color: var(--c-ink); font-weight: var(--w-b); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 14px 20px; border-radius: var(--r-md); font-size: var(--t-md); font-weight: var(--w-sb); border: none; cursor: pointer; transition: transform 0.08s ease, opacity 0.15s ease; user-select: none; font-family: inherit; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 1; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--c-ink); color: #fff; }
+.btn-primary:disabled { background: var(--c-ink-4); }
+.btn-coral { background: var(--c-coral); color: #fff; }
+.btn-coral:disabled { background: var(--c-ink-4); }
+.btn-lg { padding: 16px 24px; font-size: var(--t-lg); border-radius: var(--r-lg); }
+.btn-block { width: 100%; }
 .toast { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #fff; padding: 10px 16px; border-radius: 20px; font-size: 13px; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
 .toast.show { opacity: 1; }
 .map-controls { position: absolute; right: 12px; bottom: calc(45% + 12px); z-index: 4; display: flex; flex-direction: column; gap: 8px; }
@@ -165,29 +194,52 @@ body { display: flex; justify-content: center; }
 </div>
 </div>
 </div>
-<div class="setup-modal" id="setupModal" style="display:none;">
-<div class="setup-card" id="setupStep1">
-<div class="step-indicator">1 / 2 단계</div>
-<div class="setup-title">시작하기 전에</div>
-<div class="setup-desc">안전한 운영을 위해 동의가 필요해요. 다른 부모에게는 닉네임만 보여요.</div>
-<div class="consent-section">
-<div class="consent-row"><input type="checkbox" id="agree1" onchange="updateLoginBtn()" /><label for="agree1"><span class="required">[필수]</span> 만 19세 이상 부모/보호자입니다</label></div>
-<div class="consent-row"><input type="checkbox" id="agree2" onchange="updateLoginBtn()" /><label for="agree2"><span class="required">[필수]</span> 자녀 안전의 책임은 본인에게 있음을 인지합니다</label></div>
-<div class="consent-row"><input type="checkbox" id="agree3" onchange="updateLoginBtn()" /><label for="agree3"><span class="required">[필수]</span> 자녀의 실명·사진·학교 등 식별정보를 입력하지 않겠습니다</label></div>
-<div class="consent-row"><input type="checkbox" id="agree4" onchange="updateLoginBtn()" /><label for="agree4"><span class="required">[필수]</span> 허위정보·부적절행동 시 영구차단·법적책임에 동의합니다</label></div>
+<div class="onboard" id="setupModal">
+<div class="onboard-body">
+<div id="onboardStep0">
+<div class="onboard-title">동네 놀이터에서<br/>또래 친구를 만나요</div>
+<div class="onboard-desc">실명·연락처 없이, 익명으로 약속만.<br/>우리 아이 또래가 언제 오는지 한눈에.</div>
+<div class="onboard-hero">
+<svg width="240" height="180" viewBox="0 0 240 180" aria-hidden="true">
+<ellipse cx="120" cy="158" rx="100" ry="10" fill="#F0EBE3"/>
+<path d="M40 30 L80 30 L80 130 M40 30 L40 130" stroke="#5C544C" stroke-width="3" stroke-linecap="round" fill="none"/>
+<path d="M55 30 L55 80 M65 30 L65 80" stroke="#5C544C" stroke-width="1.5"/>
+<rect x="48" y="80" width="24" height="6" rx="2" fill="#FF6B6B"/>
+<path d="M150 50 L150 130 M210 130 L150 90" stroke="#5C544C" stroke-width="3" stroke-linecap="round" fill="none"/>
+<rect x="140" y="40" width="20" height="14" rx="3" fill="#4A90E2"/>
+<path d="M150 90 Q170 100 210 130" stroke="#FFD27A" stroke-width="6" fill="none" stroke-linecap="round"/>
+<circle cx="200" cy="35" r="14" fill="#FFD27A"/>
+<circle cx="105" cy="118" r="8" fill="#FFB088"/>
+<rect x="98" y="124" width="14" height="18" rx="4" fill="#4A90E2"/>
+<circle cx="125" cy="118" r="8" fill="#FFB088"/>
+<rect x="118" y="124" width="14" height="18" rx="4" fill="#FF6B6B"/>
+</svg>
 </div>
-<button class="setup-btn" onclick="proceedToStep2()" id="kakaoLoginBtn" disabled>동의하고 다음 단계로</button>
-<div style="font-size:10px;color:#aaa;margin-top:10px;text-align:center;line-height:1.5;">베타 단계: 카카오 로그인은 정식 출시 시 추가됩니다.</div>
+<button class="btn btn-primary btn-lg btn-block" onclick="onboardGo(1)">시작하기</button>
 </div>
-<div class="setup-card" id="setupStep2" style="display:none;">
-<div class="step-indicator">2 / 2 단계</div>
-<div class="setup-title">정보 입력</div>
-<div class="user-info-card"><span id="kakaoUserInfo">✓ 동의 완료</span></div>
-<div class="setup-field"><label class="setup-label">닉네임 (다른 부모에게 보임)</label><input type="text" class="setup-input" id="inputNickname" placeholder="예: 토끼맘" maxlength="10" /></div>
-<div class="setup-field"><label class="setup-label">아이 나이</label><select class="setup-select" id="inputAge"><option value="">선택해주세요</option><option value="3">3세</option><option value="4">4세</option><option value="5">5세</option><option value="6">6세</option><option value="7">7세</option><option value="8">8세</option><option value="9">9세</option><option value="10">10세</option><option value="11">11세 이상</option></select></div>
-<div class="setup-field"><label class="setup-label">성별</label><select class="setup-select" id="inputGender"><option value="">선택해주세요</option><option value="남아">남아</option><option value="여아">여아</option><option value="비공개">비공개</option></select></div>
-<button class="setup-btn" onclick="saveSetup()">시작하기</button>
+<div id="onboardStep1" style="display:none;">
+<button class="onboard-back" onclick="onboardGo(0)" aria-label="이전">←</button>
+<div class="onboard-title sub">먼저 동의해 주세요</div>
+<div class="onboard-desc muted">안전한 만남을 위해 모두 필수예요</div>
+<div class="check check-master" id="agreeAll" onclick="onboardToggleAll()"><div class="check-box">✓</div><div class="check-text bold">전체 동의</div></div>
+<div class="check" data-agree="a" onclick="onboardToggleOne('a')"><div class="check-box">✓</div><div class="check-text"><span class="check-text-required">[필수]</span>개인정보 수집 및 이용 동의</div></div>
+<div class="check" data-agree="b" onclick="onboardToggleOne('b')"><div class="check-box">✓</div><div class="check-text"><span class="check-text-required">[필수]</span>위치정보 이용 동의</div></div>
+<div class="check" data-agree="c" onclick="onboardToggleOne('c')"><div class="check-box">✓</div><div class="check-text"><span class="check-text-required">[필수]</span>만 19세 이상 본인입니다</div></div>
+<div class="check" data-agree="d" onclick="onboardToggleOne('d')"><div class="check-box">✓</div><div class="check-text"><span class="check-text-required">[필수]</span>안전수칙을 읽고 동의합니다</div></div>
+<div style="margin-top:24px;"><button class="btn btn-primary btn-lg btn-block" id="agreeNextBtn" onclick="onboardGo(2)" disabled>다음</button></div>
 </div>
+<div id="onboardStep2" style="display:none;">
+<button class="onboard-back" onclick="onboardGo(1)" aria-label="이전">←</button>
+<div class="onboard-title sub">어떻게 불러드릴까요?</div>
+<div class="onboard-desc muted">실명은 노출되지 않아요. 가명을 추천드려요.</div>
+<div class="field"><label class="field-label">닉네임</label><input class="field-input" id="inputNickname" placeholder="예: 해온맘" maxlength="10" oninput="onboardCheckNick()"/><div class="field-hint">2~10자</div></div>
+<div class="field"><label class="field-label">우리 아이 나이</label><div class="age-grid" id="ageGrid"></div></div>
+<div class="field"><label class="field-label">우리 아이 성별</label><div class="seg" id="genderSeg"><div class="seg-opt active" data-gender="남아" onclick="onboardSetGender('남아')">남아</div><div class="seg-opt" data-gender="여아" onclick="onboardSetGender('여아')">여아</div><div class="seg-opt" data-gender="비공개" onclick="onboardSetGender('비공개')">비공개</div></div></div>
+<div class="safety-tip"><div class="safety-tip-icon">🛡️</div><div class="safety-tip-text"><strong>아이 실명·사진·학교</strong>는 절대 입력하지 마세요. 다른 부모에게도 노출되지 않아요.</div></div>
+<button class="btn btn-coral btn-lg btn-block" id="finishBtn" onclick="saveSetup()" disabled>시작하기</button>
+</div>
+</div>
+<div class="onboard-footer"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div><div class="dot" id="dot2"></div></div>
 </div>
 <div class="toast" id="toast"></div>
 </div>
@@ -205,29 +257,87 @@ const state = {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('setupModal').style.display = 'flex';
+  document.getElementById('setupModal').classList.add('show');
   initLocation();
 });
 
-function updateLoginBtn() {
-  const all = ['agree1', 'agree2', 'agree3', 'agree4'].every(id => document.getElementById(id).checked);
-  document.getElementById('kakaoLoginBtn').disabled = !all;
+const onboard = { step: 0, agree: { a: false, b: false, c: false, d: false }, age: null, gender: '남아' };
+
+function onboardGo(step) {
+  onboard.step = step;
+  for (let i = 0; i < 3; i++) {
+    document.getElementById('onboardStep' + i).style.display = i === step ? 'block' : 'none';
+    document.getElementById('dot' + i).classList.toggle('active', i === step);
+  }
+  if (step === 2) renderAgeGrid();
 }
 
-function proceedToStep2() {
-  document.getElementById('setupStep1').style.display = 'none';
-  document.getElementById('setupStep2').style.display = 'block';
+function onboardToggleOne(key) {
+  onboard.agree[key] = !onboard.agree[key];
+  syncAgreeUI();
+}
+
+function onboardToggleAll() {
+  const all = Object.values(onboard.agree).every(Boolean);
+  const v = !all;
+  Object.keys(onboard.agree).forEach(k => { onboard.agree[k] = v; });
+  syncAgreeUI();
+}
+
+function syncAgreeUI() {
+  ['a','b','c','d'].forEach(k => {
+    const el = document.querySelector('.check[data-agree="' + k + '"]');
+    if (el) el.classList.toggle('checked', onboard.agree[k]);
+  });
+  const all = Object.values(onboard.agree).every(Boolean);
+  document.getElementById('agreeAll').classList.toggle('checked', all);
+  document.getElementById('agreeNextBtn').disabled = !all;
+}
+
+function renderAgeGrid() {
+  const grid = document.getElementById('ageGrid');
+  if (grid.children.length) return;
+  for (let a = 0; a <= 11; a++) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'age-btn' + (onboard.age === a ? ' active' : '');
+    btn.textContent = a + '세';
+    btn.dataset.age = a;
+    btn.addEventListener('click', () => onboardSetAge(a));
+    grid.appendChild(btn);
+  }
+}
+
+function onboardSetAge(a) {
+  onboard.age = a;
+  document.querySelectorAll('#ageGrid .age-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.age) === a);
+  });
+  updateFinishBtn();
+}
+
+function onboardSetGender(g) {
+  onboard.gender = g;
+  document.querySelectorAll('#genderSeg .seg-opt').forEach(o => {
+    o.classList.toggle('active', o.dataset.gender === g);
+  });
+}
+
+function onboardCheckNick() {
+  updateFinishBtn();
+}
+
+function updateFinishBtn() {
+  const nick = document.getElementById('inputNickname').value.trim();
+  document.getElementById('finishBtn').disabled = !(nick.length >= 2 && onboard.age !== null);
 }
 
 function saveSetup() {
   const nickname = document.getElementById('inputNickname').value.trim();
-  const age = document.getElementById('inputAge').value;
-  const gender = document.getElementById('inputGender').value;
-  if (!nickname) { showToast('닉네임을 입력해주세요'); return; }
-  if (!age) { showToast('아이 나이를 선택해주세요'); return; }
-  if (!gender) { showToast('성별을 선택해주세요'); return; }
-  state.me = { nickname, age, gender, verified: false };
-  document.getElementById('setupModal').style.display = 'none';
+  if (nickname.length < 2) { showToast('닉네임은 2자 이상 입력해주세요'); return; }
+  if (onboard.age === null) { showToast('아이 나이를 선택해주세요'); return; }
+  state.me = { nickname, age: String(onboard.age), gender: onboard.gender, verified: false };
+  document.getElementById('setupModal').classList.remove('show');
   updateMeBadge();
   showToast('환영해요, ' + nickname + '님!');
 }
@@ -235,15 +345,15 @@ function saveSetup() {
 function openSetup() {
   if (state.me) {
     document.getElementById('inputNickname').value = state.me.nickname;
-    document.getElementById('inputAge').value = state.me.age;
-    document.getElementById('inputGender').value = state.me.gender;
-    document.getElementById('setupStep1').style.display = 'none';
-    document.getElementById('setupStep2').style.display = 'block';
+    onboard.age = parseInt(state.me.age);
+    onboard.gender = state.me.gender;
+    onboardGo(2);
+    onboardSetGender(state.me.gender);
+    updateFinishBtn();
   } else {
-    document.getElementById('setupStep1').style.display = 'block';
-    document.getElementById('setupStep2').style.display = 'none';
+    onboardGo(0);
   }
-  document.getElementById('setupModal').style.display = 'flex';
+  document.getElementById('setupModal').classList.add('show');
 }
 
 function updateMeBadge() {
@@ -688,7 +798,7 @@ function toggleHourReservation(itemId, hour) {
     }
     item.reservations = item.reservations || [];
     item.reservations.push({
-      userId: 'me-' + Date.now(),
+      userId: 'me',
       nickname: state.me.nickname, age: parseInt(state.me.age),
       gender: state.me.gender, verified: state.me.verified, mine: true,
       startHour: hour, endHour: hour + 1,
