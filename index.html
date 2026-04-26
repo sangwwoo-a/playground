@@ -54,18 +54,21 @@ body { display: flex; justify-content: center; }
 .flag-bubble.lots { background: var(--pin-busy); }
 .flag-bubble .group-count { background: rgba(255,255,255,0.25); padding: 1px 5px; border-radius: var(--r-pill); font-size: 10px; font-weight: var(--w-b); color: #fff; position: static; border: none; }
 .me-marker { width: 18px; height: 18px; background: #007aff; border: 3px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); }
-.bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); z-index: 5; max-height: 45%; display: flex; flex-direction: column; }
-.sheet-handle { width: 40px; height: 4px; background: #ddd; border-radius: 2px; margin: 8px auto 4px; }
-.sheet-header { padding: 8px 16px 12px; display: flex; justify-content: space-between; align-items: center; }
-.sheet-list { overflow-y: auto; padding: 0 8px 16px; }
-.pg-card { padding: 12px; margin: 4px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; gap: 12px; }
-.pg-card:hover { background: #f5f5f5; }
+.bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: var(--c-card); border-top-left-radius: var(--r-2xl); border-top-right-radius: var(--r-2xl); box-shadow: var(--sh-modal); z-index: 5; max-height: 50%; display: flex; flex-direction: column; overflow: hidden; }
+.sheet-handle { width: 36px; height: 4px; background: var(--c-ink-4); border-radius: 2px; margin: 8px auto 4px; }
+.sheet-header { padding: 8px 20px 12px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.sheet-title { font-size: var(--t-lg); font-weight: var(--w-b); color: var(--c-ink); letter-spacing: -0.01em; }
+.sheet-meta { font-size: var(--t-xs); color: var(--c-ink-3); font-weight: var(--w-m); }
+.sheet-list { overflow-y: auto; padding: 0 4px 16px; flex: 1; }
+.pg-card { display: flex; align-items: flex-start; padding: 14px 16px; gap: 12px; border-bottom: 1px solid var(--c-line-soft); cursor: pointer; transition: background 0.12s; }
+.pg-card:active { background: var(--c-bg); }
+.pg-card:last-child { border-bottom: none; }
 .pg-info { flex: 1; min-width: 0; }
-.pg-name { font-size: 14px; font-weight: 600; color: #222; }
-.pg-meta { font-size: 12px; color: #888; margin-top: 2px; }
-.pg-stats { background: #fff5f5; color: #ff5a5f; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 700; min-width: 64px; text-align: center; }
-.pg-stats.empty { background: #f5f5f5; color: #aaa; }
-.pg-card .group-badge { font-size: 10px; color: #fff; background: #ff5a5f; border-radius: 8px; padding: 1px 6px; margin-left: 6px; vertical-align: 2px; }
+.pg-name { font-size: var(--t-md); font-weight: var(--w-sb); color: var(--c-ink); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; line-height: 1.3; }
+.pg-meta { font-size: var(--t-sm); color: var(--c-ink-3); font-weight: var(--w-m); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pg-stats { flex-shrink: 0; padding: 6px 10px; border-radius: var(--r-sm); font-size: var(--t-sm); font-weight: var(--w-b); background: var(--c-coral-soft); color: var(--c-coral-deep); white-space: nowrap; align-self: center; }
+.pg-stats.empty { background: var(--c-bg); color: var(--c-ink-3); }
+.pg-card .group-badge { background: var(--c-coral-soft); color: var(--c-coral-deep); padding: 1px 6px; border-radius: var(--r-pill); font-size: var(--t-xs); font-weight: var(--w-b); margin-left: 0; vertical-align: baseline; flex-shrink: 0; }
 .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 20; display: none; align-items: flex-end; }
 .modal-backdrop.show { display: flex; }
 .modal { background: #fff; width: 100%; border-radius: 20px 20px 0 0; max-height: 85%; display: flex; flex-direction: column; }
@@ -159,7 +162,7 @@ body { display: flex; justify-content: center; }
 </div>
 <div class="bottom-sheet">
 <div class="sheet-handle"></div>
-<div class="sheet-header"><div style="font-size:15px;font-weight:700;">근처 놀이터</div><div style="font-size:12px;color:#888;" id="sheetCount">0곳</div></div>
+<div class="sheet-header"><div class="sheet-title">근처 놀이터</div><div class="sheet-meta" id="sheetCount">0곳</div></div>
 <div class="sheet-list" id="sheetList"></div>
 </div>
 <div class="modal-backdrop" id="modalBackdrop" onclick="closeModalBackdrop(event)">
