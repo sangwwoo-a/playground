@@ -69,17 +69,20 @@ body { display: flex; justify-content: center; }
 .pg-stats { flex-shrink: 0; padding: 6px 10px; border-radius: var(--r-sm); font-size: var(--t-sm); font-weight: var(--w-b); background: var(--c-coral-soft); color: var(--c-coral-deep); white-space: nowrap; align-self: center; }
 .pg-stats.empty { background: var(--c-bg); color: var(--c-ink-3); }
 .pg-card .group-badge { background: var(--c-coral-soft); color: var(--c-coral-deep); padding: 1px 6px; border-radius: var(--r-pill); font-size: var(--t-xs); font-weight: var(--w-b); margin-left: 0; vertical-align: baseline; flex-shrink: 0; }
-.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 20; display: none; align-items: flex-end; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(40, 30, 20, 0.45); z-index: 20; display: none; align-items: flex-end; justify-content: center; }
 .modal-backdrop.show { display: flex; }
-.modal { background: #fff; width: 100%; border-radius: 20px 20px 0 0; max-height: 85%; display: flex; flex-direction: column; }
-.modal-header { padding: 20px 20px 12px; border-bottom: 1px solid #f0f0f0; position: relative; }
-.modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: #f5f5f5; border: none; border-radius: 50%; font-size: 18px; cursor: pointer; }
-.modal-pg-name { font-size: 18px; font-weight: 700; color: #222; padding-right: 40px; }
-.modal-pg-addr { font-size: 12px; color: #888; margin-top: 4px; }
-.modal-pg-summary { margin-top: 14px; padding: 12px; background: #fff5f5; border-radius: 10px; font-size: 13px; color: #d63b3b; font-weight: 600; }
-.modal-pg-summary.empty { background: #f5f5f5; color: #888; }
-.modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
-.section-title { font-size: 14px; font-weight: 700; margin: 0 0 12px; display: flex; justify-content: space-between; }
+.modal { background: var(--c-card); width: 100%; border-top-left-radius: var(--r-2xl); border-top-right-radius: var(--r-2xl); max-height: 92%; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--sh-modal); animation: modalSlideUp 0.22s ease-out; }
+@keyframes modalSlideUp { from { transform: translateY(20%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-header { padding: 20px 20px 18px; background: linear-gradient(180deg, var(--c-coral-soft) 0%, var(--c-cream) 100%); position: relative; }
+.modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: var(--c-bg); border: none; border-radius: 50%; font-size: 18px; cursor: pointer; color: var(--c-ink-2); display: grid; place-items: center; }
+.modal-pg-name { font-size: var(--t-2xl); font-weight: var(--w-b); color: var(--c-ink); padding-right: 40px; letter-spacing: -0.02em; line-height: 1.25; }
+.modal-pg-addr { font-size: var(--t-sm); color: var(--c-ink-2); margin-top: 6px; font-weight: var(--w-m); }
+.modal-pg-summary { margin-top: 14px; padding: 10px 14px; background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-md); font-size: var(--t-sm); color: var(--c-ink); font-weight: var(--w-sb); }
+.modal-pg-summary b { color: var(--c-coral-deep); font-weight: var(--w-b); }
+.modal-pg-summary.empty { background: var(--c-bg); color: var(--c-ink-3); border-color: var(--c-line-soft); }
+.modal-body { padding: 8px 0 16px; overflow-y: auto; flex: 1; }
+.section-title { font-size: var(--t-xs); font-weight: var(--w-b); color: var(--c-ink-3); letter-spacing: 0.04em; text-transform: uppercase; margin: 0; padding: 16px 20px 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.section-title span { color: var(--c-ink-3); font-weight: var(--w-m); text-transform: none; letter-spacing: 0; }
 .timeslot-list { display: flex; flex-direction: column; gap: 6px; }
 .timeslot { background: #fafafa; border-radius: 12px; padding: 10px 12px; display: grid; grid-template-columns: 56px 1fr; gap: 10px; align-items: center; }
 .timeslot.has-kids { background: #fff7f7; }
@@ -117,12 +120,13 @@ body { display: flex; justify-content: center; }
 .my-reservation-info small { display: block; font-weight: 500; font-size: 11px; }
 .my-reservation-cancel { background: #fff; border: 1px solid #34c759; color: #1b7a3a; border-radius: 8px; padding: 6px 12px; font-size: 11px; cursor: pointer; }
 .start-join-btn { background: #ff5a5f; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 12px; }
-.group-list-item { background: #fafafa; border-radius: 12px; padding: 12px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-.group-list-item:hover { background: #f0f0f0; }
-.group-list-item.has-kids { background: #fff7f7; }
-.group-list-name { font-size: 14px; font-weight: 600; color: #222; flex: 1; }
-.group-list-stats { font-size: 12px; font-weight: 700; color: #ff5a5f; background: #fff5f5; padding: 4px 10px; border-radius: 8px; min-width: 64px; text-align: center; }
-.group-list-stats.empty { background: #f5f5f5; color: #aaa; }
+.group-list-item { display: flex; align-items: center; padding: 14px 20px; gap: 12px; border-bottom: 1px solid var(--c-line-soft); cursor: pointer; transition: background 0.12s; }
+.group-list-item:active { background: var(--c-bg); }
+.group-list-item:last-child { border-bottom: none; }
+.group-list-item.has-kids { background: transparent; }
+.group-list-name { font-size: var(--t-md); font-weight: var(--w-sb); color: var(--c-ink); flex: 1; line-height: 1.3; }
+.group-list-stats { flex-shrink: 0; font-size: var(--t-sm); font-weight: var(--w-b); color: var(--c-coral-deep); background: var(--c-coral-soft); padding: 6px 10px; border-radius: var(--r-sm); white-space: nowrap; }
+.group-list-stats.empty { background: var(--c-bg); color: var(--c-ink-3); }
 .setup-modal { position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 30; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .setup-card { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; }
 .setup-title { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
