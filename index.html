@@ -84,9 +84,9 @@ body { display: flex; justify-content: center; }
 .pg-card .group-badge { background: var(--c-coral-soft); color: var(--c-coral-deep); padding: 1px 6px; border-radius: var(--r-pill); font-size: var(--t-xs); font-weight: var(--w-b); margin-left: 0; vertical-align: baseline; flex-shrink: 0; }
 .modal-backdrop { position: absolute; inset: 0; z-index: 20; display: none; }
 .modal-backdrop.show { display: block; }
-.modal { background: var(--c-card); width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); position: relative; animation: modalFadeIn 0.18s ease-out; }
+.modal { background: var(--c-card); width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; padding-bottom: env(safe-area-inset-bottom); position: relative; animation: modalFadeIn 0.18s ease-out; }
 @keyframes modalFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.modal-header { padding: 20px 20px 18px; background: linear-gradient(180deg, var(--c-coral-soft) 0%, var(--c-cream) 100%); position: relative; }
+.modal-header { padding: calc(env(safe-area-inset-top) + 20px) 20px 18px; background: linear-gradient(180deg, var(--c-coral-soft) 0%, var(--c-cream) 100%); position: relative; }
 .modal-close { position: absolute; top: calc(env(safe-area-inset-top) + 12px); right: 12px; width: 36px; height: 36px; background: var(--c-bg); border: none; border-radius: 50%; font-size: 20px; cursor: pointer; color: var(--c-ink-2); display: grid; place-items: center; z-index: 2; }
 .modal-pg-name { font-size: var(--t-2xl); font-weight: var(--w-b); color: var(--c-ink); padding-right: 40px; letter-spacing: -0.02em; line-height: 1.25; }
 .modal-pg-addr { font-size: var(--t-sm); color: var(--c-ink-2); margin-top: 6px; font-weight: var(--w-m); }
