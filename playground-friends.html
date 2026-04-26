@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>오늘의놀이터</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f5f5f5; }
+body { display: flex; justify-content: center; }
+.app { width: 100%; max-width: 430px; height: 100vh; background: #fff; position: relative; overflow: hidden; }
+.header { position: absolute; top: 0; left: 0; right: 0; z-index: 10; padding: 14px 16px 12px; background: rgba(255,255,255,0.95); }
+.header-row { display: flex; align-items: center; justify-content: space-between; }
+.title { font-size: 18px; font-weight: 700; color: #222; }
+.me-badge { background: #fff; border: 1px solid #e5e5e5; border-radius: 20px; padding: 6px 12px; font-size: 12px; color: #555; cursor: pointer; }
+.search-bar { margin-top: 10px; background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 10px 14px; font-size: 13px; color: #888; }
+#map { width: 100%; height: 100%; background: #e8eef0; }
+.playground-flag { position: relative; cursor: pointer; transform: translate(-50%, -100%); }
+.flag-bubble { background: #ff5a5f; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 700; white-space: nowrap; min-width: 56px; text-align: center; border: 2px solid #fff; position: relative; }
+.flag-bubble.few { background: #4a90e2; }
+.flag-bubble.empty { background: #aaa; }
+.flag-bubble.lots { background: #ff3b30; }
+.flag-bubble .group-count { position: absolute; top: -6px; right: -8px; background: #fff; color: #ff5a5f; font-size: 10px; font-weight: 700; border-radius: 8px; padding: 1px 5px; border: 1px solid #ff5a5f; }
+.flag-pole { width: 2px; height: 14px; background: #fff; margin: 0 auto; }
+.flag-dot { width: 10px; height: 10px; border-radius: 50%; background: #fff; margin: -2px auto 0; }
+.me-marker { width: 18px; height: 18px; background: #007aff; border: 3px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); }
+.bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); z-index: 5; max-height: 45%; display: flex; flex-direction: column; }
+.sheet-handle { width: 40px; height: 4px; background: #ddd; border-radius: 2px; margin: 8px auto 4px; }
+.sheet-header { padding: 8px 16px 12px; display: flex; justify-content: space-between; align-items: center; }
+.sheet-list { overflow-y: auto; padding: 0 8px 16px; }
+.pg-card { padding: 12px; margin: 4px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; gap: 12px; }
+.pg-card:hover { background: #f5f5f5; }
+.pg-info { flex: 1; min-width: 0; }
+.pg-name { font-size: 14px; font-weight: 600; color: #222; }
+.pg-meta { font-size: 12px; color: #888; margin-top: 2px; }
+.pg-stats { background: #fff5f5; color: #ff5a5f; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 700; min-width: 64px; text-align: center; }
+.pg-stats.empty { background: #f5f5f5; color: #aaa; }
+.pg-card .group-badge { font-size: 10px; color: #fff; background: #ff5a5f; border-radius: 8px; padding: 1px 6px; margin-left: 6px; vertical-align: 2px; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 20; display: none; align-items: flex-end; }
+.modal-backdrop.show { display: flex; }
+.modal { background: #fff; width: 100%; border-radius: 20px 20px 0 0; max-height: 85%; display: flex; flex-direction: column; }
+.modal-header { padding: 20px 20px 12px; border-bottom: 1px solid #f0f0f0; position: relative; }
+.modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: #f5f5f5; border: none; border-radius: 50%; font-size: 18px; cursor: pointer; }
+.modal-pg-name { font-size: 18px; font-weight: 700; color: #222; padding-right: 40px; }
+.modal-pg-addr { font-size: 12px; color: #888; margin-top: 4px; }
+.modal-pg-summary { margin-top: 14px; padding: 12px; background: #fff5f5; border-radius: 10px; font-size: 13px; color: #d63b3b; font-weight: 600; }
+.modal-pg-summary.empty { background: #f5f5f5; color: #888; }
+.modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+.section-title { font-size: 14px; font-weight: 700; margin: 0 0 12px; display: flex; justify-content: space-between; }
+.timeslot-list { display: flex; flex-direction: column; gap: 6px; }
+.timeslot { background: #fafafa; border-radius: 12px; padding: 10px 12px; display: grid; grid-template-columns: 56px 1fr; gap: 10px; align-items: center; }
+.timeslot.has-kids { background: #fff7f7; }
+.timeslot.expanded { padding-bottom: 12px; }
+.timeslot.past { opacity: 0.5; }
+.ts-time { font-size: 14px; font-weight: 700; color: #222; }
+.ts-time-period { font-size: 10px; color: #999; display: block; }
+.ts-info { display: flex; align-items: center; gap: 8px; }
+.ts-count { font-size: 13px; font-weight: 700; color: #ff5a5f; }
+.ts-count.zero { color: #ccc; }
+.ts-avatars { display: flex; align-items: center; }
+.ts-avatar { width: 22px; height: 22px; border-radius: 50%; background: #ffd5d6; color: #ff5a5f; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 2px solid #fff; margin-left: -6px; }
+.ts-avatar:first-child { margin-left: 0; }
+.ts-avatar.boy { background: #d6e7ff; color: #4a90e2; }
+.ts-avatar.girl { background: #ffd9ec; color: #e84a8e; }
+.ts-avatar.me { background: #ff5a5f; color: #fff; }
+.ts-avatar-more { width: 22px; height: 22px; border-radius: 50%; background: #f0f0f0; color: #888; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-left: -6px; border: 2px solid #fff; }
+.ts-detail { grid-column: 1 / -1; margin-top: 8px; padding-top: 10px; border-top: 1px dashed #ebebeb; display: none; flex-wrap: wrap; gap: 6px; }
+.timeslot.expanded .ts-detail { display: flex; }
+.kid-chip { background: #fff; border: 1px solid #ffd9da; border-radius: 14px; padding: 4px 10px; font-size: 11px; color: #555; }
+.kid-chip.me { background: #ff5a5f; color: #fff; border-color: #ff5a5f; }
+.timeslot.selecting { cursor: pointer; background: #fff; border: 2px dashed #e0e0e0; padding: 8px 10px; }
+.timeslot.selecting.range-start, .timeslot.selecting.range-end { background: #ff5a5f !important; color: #fff; }
+.timeslot.selecting.range-middle { background: #ffe5e6 !important; }
+.timeslot.selecting.disabled-pick { opacity: 0.3; pointer-events: none; }
+.range-banner { background: linear-gradient(135deg, #ff5a5f, #ff8a5f); color: #fff; padding: 12px 14px; border-radius: 12px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.range-banner-left { flex: 1; }
+.range-banner-time { font-size: 14px; font-weight: 700; }
+.range-banner-actions { display: flex; gap: 6px; }
+.range-btn { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+.range-btn.confirm { background: #fff; color: #ff5a5f; }
+.range-btn:disabled { opacity: 0.5; }
+.my-reservation { background: #e8f5e9; border: 1px solid #a8e3ad; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.my-reservation-info { color: #1b7a3a; font-weight: 700; font-size: 13px; }
+.my-reservation-info small { display: block; font-weight: 500; font-size: 11px; }
+.my-reservation-cancel { background: #fff; border: 1px solid #34c759; color: #1b7a3a; border-radius: 8px; padding: 6px 12px; font-size: 11px; cursor: pointer; }
+.start-join-btn { background: #ff5a5f; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 12px; }
+.group-list-item { background: #fafafa; border-radius: 12px; padding: 12px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.group-list-item:hover { background: #f0f0f0; }
+.group-list-item.has-kids { background: #fff7f7; }
+.group-list-name { font-size: 14px; font-weight: 600; color: #222; flex: 1; }
+.group-list-stats { font-size: 12px; font-weight: 700; color: #ff5a5f; background: #fff5f5; padding: 4px 10px; border-radius: 8px; min-width: 64px; text-align: center; }
+.group-list-stats.empty { background: #f5f5f5; color: #aaa; }
+.setup-modal { position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 30; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.setup-card { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; }
+.setup-title { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
+.setup-desc { font-size: 13px; color: #888; margin: 0 0 16px; line-height: 1.5; }
+.setup-field { margin-bottom: 14px; }
+.setup-label { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 6px; display: block; }
+.setup-input, .setup-select { width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 8px; }
+.setup-btn { width: 100%; padding: 12px; background: #ff5a5f; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.setup-btn:disabled { background: #ddd; cursor: not-allowed; }
+.consent-section { background: #fff8f8; border: 1px solid #ffd9da; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+.consent-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 12px; color: #555; line-height: 1.5; }
+.consent-row:last-child { margin-bottom: 0; }
+.consent-row label { flex: 1; cursor: pointer; }
+.required { color: #ff5a5f; font-weight: 700; }
+.user-info-card { background: #f0f9f0; border: 1px solid #a8e3ad; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 12px; color: #1b7a3a; }
+.step-indicator { font-size: 11px; color: #888; margin-bottom: 8px; }
+.toast { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #fff; padding: 10px 16px; border-radius: 20px; font-size: 13px; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.toast.show { opacity: 1; }
+.map-controls { position: absolute; right: 12px; bottom: calc(45% + 12px); z-index: 4; display: flex; flex-direction: column; gap: 8px; }
+.map-btn { width: 42px; height: 42px; background: #fff; border: none; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; font-size: 18px; }
+</style>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=298aeb2bbbab45bba43939a427b6b381&libraries=services" onerror="window.__kakaoLoadFailed=true"></script>
+</head>
+<body>
+<div class="app">
+<div class="header">
+<div class="header-row">
+<div class="title">🛝 오늘의놀이터</div>
+<div class="me-badge" id="meBadge" onclick="openSetup()"><span id="meIcon">👤</span> <span id="meName">설정하기</span></div>
+</div>
+<div class="search-bar" onclick="toggleDemoMode()" style="cursor:pointer;"><span id="demoBadge">🧪 데모 모드 (탭하여 끄기)</span></div>
+</div>
+<div id="map"></div>
+<div class="map-controls">
+<button class="map-btn" onclick="centerToMe()">📍</button>
+<button class="map-btn" onclick="refreshData()">🔄</button>
+</div>
+<div class="bottom-sheet">
+<div class="sheet-handle"></div>
+<div class="sheet-header"><div style="font-size:15px;font-weight:700;">근처 놀이터</div><div style="font-size:12px;color:#888;" id="sheetCount">0곳</div></div>
+<div class="sheet-list" id="sheetList"></div>
+</div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModalBackdrop(event)">
+<div class="modal" onclick="event.stopPropagation()">
+<div class="modal-header">
+<button class="modal-close" onclick="closeModal()">×</button>
+<div class="modal-pg-name" id="modalName"></div>
+<div class="modal-pg-addr" id="modalAddr"></div>
+<div class="modal-pg-summary" id="modalSummary"></div>
+</div>
+<div class="modal-body" id="modalBody">
+</div>
+</div>
+</div>
+<div class="setup-modal" id="setupModal" style="display:none;">
+<div class="setup-card" id="setupStep1">
+<div class="step-indicator">1 / 2 단계</div>
+<div class="setup-title">시작하기 전에</div>
+<div class="setup-desc">안전한 운영을 위해 동의가 필요해요. 다른 부모에게는 닉네임만 보여요.</div>
+<div class="consent-section">
+<div class="consent-row"><input type="checkbox" id="agree1" onchange="updateLoginBtn()" /><label for="agree1"><span class="required">[필수]</span> 만 19세 이상 부모/보호자입니다</label></div>
+<div class="consent-row"><input type="checkbox" id="agree2" onchange="updateLoginBtn()" /><label for="agree2"><span class="required">[필수]</span> 자녀 안전의 책임은 본인에게 있음을 인지합니다</label></div>
+<div class="consent-row"><input type="checkbox" id="agree3" onchange="updateLoginBtn()" /><label for="agree3"><span class="required">[필수]</span> 자녀의 실명·사진·학교 등 식별정보를 입력하지 않겠습니다</label></div>
+<div class="consent-row"><input type="checkbox" id="agree4" onchange="updateLoginBtn()" /><label for="agree4"><span class="required">[필수]</span> 허위정보·부적절행동 시 영구차단·법적책임에 동의합니다</label></div>
+</div>
+<button class="setup-btn" onclick="proceedToStep2()" id="kakaoLoginBtn" disabled>동의하고 다음 단계로</button>
+<div style="font-size:10px;color:#aaa;margin-top:10px;text-align:center;line-height:1.5;">베타 단계: 카카오 로그인은 정식 출시 시 추가됩니다.</div>
+</div>
+<div class="setup-card" id="setupStep2" style="display:none;">
+<div class="step-indicator">2 / 2 단계</div>
+<div class="setup-title">정보 입력</div>
+<div class="user-info-card"><span id="kakaoUserInfo">✓ 동의 완료</span></div>
+<div class="setup-field"><label class="setup-label">닉네임 (다른 부모에게 보임)</label><input type="text" class="setup-input" id="inputNickname" placeholder="예: 토끼맘" maxlength="10" /></div>
+<div class="setup-field"><label class="setup-label">아이 나이</label><select class="setup-select" id="inputAge"><option value="">선택해주세요</option><option value="3">3세</option><option value="4">4세</option><option value="5">5세</option><option value="6">6세</option><option value="7">7세</option><option value="8">8세</option><option value="9">9세</option><option value="10">10세</option><option value="11">11세 이상</option></select></div>
+<div class="setup-field"><label class="setup-label">성별</label><select class="setup-select" id="inputGender"><option value="">선택해주세요</option><option value="남아">남아</option><option value="여아">여아</option><option value="비공개">비공개</option></select></div>
+<button class="setup-btn" onclick="saveSetup()">시작하기</button>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+</div>
+<script>
+const TIME_SLOTS = [];
+for (let h = 7; h <= 21; h++) TIME_SLOTS.push(h);
+const MIN_HOURS = 1;
+const MAX_HOURS = 4;
+const SEARCH_RADIUS_M = 1000;
+const MAX_DISPLAY = 50;
+
+const state = {
+  me: null, myLocation: null, groups: [], allPlaygrounds: null, allGroups: null,
+  selectedGroupId: null, viewingItemId: null,
+  map: null, markers: [], meMarker: null,
+  demoMode: true,
+  rangeMode: false, rangeStart: null, rangeEnd: null, rangeForItemId: null,
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('setupModal').style.display = 'flex';
+  initLocation();
+});
+
+function updateLoginBtn() {
+  const all = ['agree1', 'agree2', 'agree3', 'agree4'].every(id => document.getElementById(id).checked);
+  document.getElementById('kakaoLoginBtn').disabled = !all;
+}
+
+function proceedToStep2() {
+  document.getElementById('setupStep1').style.display = 'none';
+  document.getElementById('setupStep2').style.display = 'block';
+}
+
+function saveSetup() {
+  const nickname = document.getElementById('inputNickname').value.trim();
+  const age = document.getElementById('inputAge').value;
+  const gender = document.getElementById('inputGender').value;
+  if (!nickname) { showToast('닉네임을 입력해주세요'); return; }
+  if (!age) { showToast('아이 나이를 선택해주세요'); return; }
+  if (!gender) { showToast('성별을 선택해주세요'); return; }
+  state.me = { nickname, age, gender, verified: false };
+  document.getElementById('setupModal').style.display = 'none';
+  updateMeBadge();
+  showToast('환영해요, ' + nickname + '님!');
+}
+
+function openSetup() {
+  if (state.me) {
+    document.getElementById('inputNickname').value = state.me.nickname;
+    document.getElementById('inputAge').value = state.me.age;
+    document.getElementById('inputGender').value = state.me.gender;
+    document.getElementById('setupStep1').style.display = 'none';
+    document.getElementById('setupStep2').style.display = 'block';
+  } else {
+    document.getElementById('setupStep1').style.display = 'block';
+    document.getElementById('setupStep2').style.display = 'none';
+  }
+  document.getElementById('setupModal').style.display = 'flex';
+}
+
+function updateMeBadge() {
+  if (!state.me) return;
+  document.getElementById('meName').textContent = state.me.nickname + ' (' + state.me.age + '세 ' + state.me.gender + ')';
+  document.getElementById('meIcon').textContent = state.me.verified ? '✅' : '👤';
+}
+
+function initLocation() {
+  const fallback = { lat: 37.5759, lng: 126.9769 };
+  if (!navigator.geolocation) { state.myLocation = fallback; initMap(); return; }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => { state.myLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }; initMap(); },
+    () => { state.myLocation = fallback; initMap(); },
+    { timeout: 5000, maximumAge: 60000 }
+  );
+}
+
+function centerToMe() {
+  if (!state.myLocation) return;
+  if (state.map && window.kakao && window.kakao.maps) {
+    state.map.setCenter(new kakao.maps.LatLng(state.myLocation.lat, state.myLocation.lng));
+  }
+  showToast('내 위치로 이동');
+}
+
+function initMap() {
+  const hasKakao = window.kakao && window.kakao.maps && !window.__kakaoLoadFailed;
+  if (!hasKakao) {
+    document.getElementById('map').style.display = 'none';
+    loadFromJson();
+    return;
+  }
+  kakao.maps.load(() => {
+    const container = document.getElementById('map');
+    const center = new kakao.maps.LatLng(state.myLocation.lat, state.myLocation.lng);
+    state.map = new kakao.maps.Map(container, { center, level: 4 });
+    const meEl = document.createElement('div');
+    meEl.className = 'me-marker';
+    state.meMarker = new kakao.maps.CustomOverlay({ position: center, content: meEl, yAnchor: 0.5, xAnchor: 0.5, zIndex: 5 });
+    state.meMarker.setMap(state.map);
+    loadFromJson();
+  });
+}
+
+// ===== 그룹화 알고리즘 =====
+
+function groupKey(addr) {
+  if (!addr) return null;
+  let s = addr
+    .replace(/\s*[\(（][^\)）]*[\)）]\s*$/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const tokens = s.split(' ');
+  let roadIdx = -1;
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    if (/(로|길|번길|대로)$/.test(tokens[i])) { roadIdx = i; break; }
+  }
+  if (roadIdx >= 0 && roadIdx < tokens.length - 1) {
+    const numToken = tokens[roadIdx + 1].replace(/(\d+)-\d+$/, '$1');
+    return tokens.slice(0, roadIdx + 1).join(' ') + ' ' + numToken;
+  }
+  if (roadIdx === tokens.length - 1) return s;
+  while (tokens.length > 0 && /^\d+(-\d+)?$/.test(tokens[tokens.length - 1])) {
+    tokens.pop();
+  }
+  return tokens.join(' ');
+}
+
+function groupCenter(items) {
+  if (items.length === 1) return { lat: items[0].y, lng: items[0].x };
+  const lats = items.map(p => p.y).sort((a, b) => a - b);
+  const lngs = items.map(p => p.x).sort((a, b) => a - b);
+  const mid = Math.floor(items.length / 2);
+  return {
+    lat: items.length % 2 ? lats[mid] : (lats[mid-1] + lats[mid]) / 2,
+    lng: items.length % 2 ? lngs[mid] : (lngs[mid-1] + lngs[mid]) / 2,
+  };
+}
+
+function groupTitle(items, addr) {
+  if (items.length === 1) return items[0].n;
+  const names = items.map(p => p.n);
+  let common = '';
+  const minLen = Math.min(...names.map(n => n.length));
+  for (let i = 0; i < minLen; i++) {
+    const ch = names[0][i];
+    if (names.every(n => n[i] === ch)) common += ch;
+    else break;
+  }
+  common = common.replace(/[\s·\-,]+$/, '').trim();
+  common = common.replace(/\s+\d+$/, '').trim();
+  if (common.length > 5) return common;
+  return (addr || '').replace(/\s*\(.*?\)\s*$/, '');
+}
+
+function buildAllGroups(playgrounds) {
+  const map = new Map();
+  for (const p of playgrounds) {
+    const key = groupKey(p.a);
+    if (!key) continue;
+    if (!map.has(key)) map.set(key, { key: key, items: [] });
+    map.get(key).items.push(p);
+  }
+  const groups = [];
+  let idx = 0;
+  for (const g of map.values()) {
+    const center = groupCenter(g.items);
+    const itemsWithId = g.items.map((p, i) => ({
+      itemId: 'item-' + idx + '-' + i,
+      n: p.n, a: p.a, y: p.y, x: p.x,
+      reservations: [],
+    }));
+    groups.push({
+      id: 'g-' + idx,
+      key: g.key,
+      addr: g.items[0].a,
+      title: groupTitle(g.items, g.items[0].a),
+      lat: center.lat,
+      lng: center.lng,
+      items: itemsWithId,
+    });
+    idx++;
+  }
+  return groups;
+}
+
+async function loadFromJson() {
+  try {
+    if (!state.allGroups) {
+      const res = await fetch('./playgrounds.json', { cache: 'force-cache' });
+      if (!res.ok) throw new Error('JSON not found');
+      state.allPlaygrounds = await res.json();
+      console.log('[데이터] 원본 로드:', state.allPlaygrounds.length, '곳');
+      state.allGroups = buildAllGroups(state.allPlaygrounds);
+      console.log('[데이터] 그룹화 결과:', state.allGroups.length, '그룹');
+    }
+    filterAndDisplay();
+  } catch (e) {
+    console.warn('JSON 로드 실패:', e.message);
+    showToast('데이터 로드 실패');
+  }
+}
+
+function filterAndDisplay() {
+  const me = state.myLocation;
+  if (!me || !state.allGroups) return;
+  const nearby = state.allGroups
+    .map(g => ({ g, d: dist(me, { lat: g.lat, lng: g.lng }) }))
+    .filter(o => o.d * 1000 <= SEARCH_RADIUS_M)
+    .sort((a, b) => a.d - b.d)
+    .slice(0, MAX_DISPLAY);
+  state.groups = nearby.map(o => {
+    o.g.items.forEach(it => { it.reservations = generateMockReservations(); });
+    return o.g;
+  });
+  if (state.groups.length === 0) {
+    const fallback = state.allGroups
+      .map(g => ({ g, d: dist(me, { lat: g.lat, lng: g.lng }) }))
+      .sort((a, b) => a.d - b.d)
+      .slice(0, 30);
+    state.groups = fallback.map(o => {
+      o.g.items.forEach(it => { it.reservations = generateMockReservations(); });
+      return o.g;
+    });
+    showToast('가까운 ' + state.groups.length + '곳');
+  } else {
+    const totalItems = state.groups.reduce((s, g) => s + g.items.length, 0);
+    showToast('단지 ' + state.groups.length + '곳 / 놀이터 ' + totalItems + '개');
+  }
+  renderMarkers();
+  renderList();
+}
+
+function generateMockReservations() {
+  const sampleNames = [
+    { nickname: '토끼맘', age: 5, gender: '남아', verified: true },
+    { nickname: '곰돌이아빠', age: 6, gender: '남아', verified: false },
+    { nickname: '햇님맘', age: 4, gender: '여아', verified: true },
+    { nickname: '딸기맘', age: 6, gender: '여아', verified: true },
+  ];
+  const reservations = [];
+  const totalCount = Math.floor(Math.random() * 4);
+  for (let i = 0; i < totalCount; i++) {
+    const person = sampleNames[Math.floor(Math.random() * sampleNames.length)];
+    const duration = 1 + Math.floor(Math.random() * 3);
+    const startHour = 7 + Math.floor(Math.random() * (21 - duration - 7 + 1));
+    reservations.push({
+      userId: 'demo-' + i + '-' + Math.random().toString(36).slice(2, 6),
+      nickname: person.nickname, age: person.age, gender: person.gender,
+      verified: person.verified, mine: false,
+      startHour: startHour, endHour: startHour + duration,
+    });
+  }
+  return reservations;
+}
+
+function kidsAtHourInItem(item, hour) {
+  return (item.reservations || []).filter(r => r.startHour <= hour && r.endHour > hour);
+}
+
+function myReservationInItem(item) {
+  return (item.reservations || []).find(r => r.mine);
+}
+
+function countItemTotal(item) {
+  const now = new Date();
+  const currentHour = now.getHours();
+  const reservations = item.reservations || [];
+  const filtered = state.demoMode ? reservations : reservations.filter(r => r.endHour > currentHour);
+  return filtered.length;
+}
+
+function countGroupTotal(group) {
+  return group.items.reduce((sum, it) => sum + countItemTotal(it), 0);
+}
+
+function renderMarkers() {
+  if (!state.map || !window.kakao) return;
+  state.markers.forEach(m => m.setMap(null));
+  state.markers = [];
+  state.groups.forEach(group => {
+    const total = countGroupTotal(group);
+    const cls = total === 0 ? 'empty' : total < 3 ? 'few' : total < 7 ? 'many' : 'lots';
+    const el = document.createElement('div');
+    el.className = 'playground-flag';
+    const groupBadge = group.items.length >= 2 ? '<span class="group-count">' + group.items.length + '</span>' : '';
+    el.innerHTML = '<div class="flag-bubble ' + cls + '">' + (total === 0 ? '0명' : total + '명') + groupBadge + '</div><div class="flag-pole"></div><div class="flag-dot"></div>';
+    el.addEventListener('click', () => openGroupModal(group.id));
+    const overlay = new kakao.maps.CustomOverlay({
+      position: new kakao.maps.LatLng(group.lat, group.lng), content: el, yAnchor: 1, xAnchor: 0.5
+    });
+    overlay.setMap(state.map);
+    state.markers.push(overlay);
+  });
+}
+
+function renderList() {
+  const list = document.getElementById('sheetList');
+  document.getElementById('sheetCount').textContent = state.groups.length + '곳';
+  list.innerHTML = '';
+  const sorted = [...state.groups].sort((a, b) => {
+    if (!state.myLocation) return 0;
+    return dist(state.myLocation, a) - dist(state.myLocation, b);
+  });
+  sorted.forEach(group => {
+    const total = countGroupTotal(group);
+    const cls = total === 0 ? 'empty' : '';
+    const distM = state.myLocation ? Math.round(dist(state.myLocation, group) * 1000) : 0;
+    const card = document.createElement('div');
+    card.className = 'pg-card';
+    const groupBadge = group.items.length >= 2 ? '<span class="group-badge">' + group.items.length + '곳</span>' : '';
+    card.innerHTML = '<div class="pg-info"><div class="pg-name">' + escapeHtml(group.title) + groupBadge + '</div><div class="pg-meta">' + (distM ? distM + 'm' : '') + ' · ' + escapeHtml(group.addr || '') + '</div></div><div class="pg-stats ' + cls + '">' + (total === 0 ? '아직 없음' : '오늘 ' + total + '명') + '</div>';
+    card.addEventListener('click', () => openGroupModal(group.id));
+    list.appendChild(card);
+  });
+}
+
+function openGroupModal(groupId) {
+  const group = state.groups.find(g => g.id === groupId);
+  if (!group) return;
+  state.selectedGroupId = groupId;
+  if (group.items.length === 1) {
+    state.viewingItemId = group.items[0].itemId;
+    showItemModal(group, group.items[0]);
+  } else {
+    state.viewingItemId = null;
+    showGroupListModal(group);
+  }
+  document.getElementById('modalBackdrop').classList.add('show');
+}
+
+function showGroupListModal(group) {
+  document.getElementById('modalName').textContent = group.title;
+  document.getElementById('modalAddr').textContent = group.addr || '';
+  const total = countGroupTotal(group);
+  const summaryEl = document.getElementById('modalSummary');
+  if (total === 0) {
+    summaryEl.className = 'modal-pg-summary empty';
+    summaryEl.innerHTML = '🌱 이 단지의 ' + group.items.length + '곳 놀이터에 아직 예약이 없어요';
+  } else {
+    summaryEl.className = 'modal-pg-summary';
+    summaryEl.innerHTML = '🎈 오늘 <b>' + total + '명</b> 예정 (' + group.items.length + '곳 놀이터 합계)';
+  }
+  const body = document.getElementById('modalBody');
+  body.innerHTML = '<div class="section-title">이 단지의 놀이터<span style="font-size:11px;color:#888;font-weight:400;">선택해서 약속 등록</span></div>';
+  group.items.forEach(item => {
+    const itotal = countItemTotal(item);
+    const cls = itotal === 0 ? 'empty' : '';
+    const row = document.createElement('div');
+    row.className = 'group-list-item' + (itotal > 0 ? ' has-kids' : '');
+    let shortName = item.n;
+    if (group.title.length > 5 && shortName.startsWith(group.title)) {
+      shortName = shortName.substring(group.title.length).replace(/^[\s,·\-]+/, '').trim();
+      if (!shortName) shortName = item.n;
+    }
+    row.innerHTML = '<div class="group-list-name">' + escapeHtml(shortName) + '</div><div class="group-list-stats ' + cls + '">' + (itotal === 0 ? '아직 없음' : '오늘 ' + itotal + '명') + '</div>';
+    row.addEventListener('click', () => {
+      state.viewingItemId = item.itemId;
+      showItemModal(group, item);
+    });
+    body.appendChild(row);
+  });
+}
+
+function showItemModal(group, item) {
+  document.getElementById('modalName').textContent = item.n;
+  document.getElementById('modalAddr').textContent = item.a || '';
+  updateItemSummary(item);
+  const body = document.getElementById('modalBody');
+  body.innerHTML = '';
+  if (group.items.length >= 2) {
+    const backBtn = document.createElement('button');
+    backBtn.style.cssText = 'background:#f5f5f5;border:none;border-radius:8px;padding:8px 12px;font-size:12px;color:#555;cursor:pointer;margin-bottom:12px;';
+    backBtn.textContent = '← ' + group.title + ' 다른 놀이터 보기';
+    backBtn.onclick = () => showGroupListModal(group);
+    body.appendChild(backBtn);
+  }
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'section-title';
+  titleDiv.innerHTML = '시간대별 참여 인원<span style="font-size:11px;color:#888;font-weight:400;">탭하면 상세</span>';
+  body.appendChild(titleDiv);
+  const tlist = document.createElement('div');
+  tlist.className = 'timeslot-list';
+  tlist.id = 'timeslotList';
+  body.appendChild(tlist);
+  renderTimeslots(item);
+}
+
+function updateItemSummary(item) {
+  const total = countItemTotal(item);
+  const summaryEl = document.getElementById('modalSummary');
+  if (total === 0) {
+    summaryEl.className = 'modal-pg-summary empty';
+    summaryEl.innerHTML = '🌱 오늘 아직 예약된 친구가 없어요. 첫 번째로 갈게요!';
+  } else {
+    summaryEl.className = 'modal-pg-summary';
+    summaryEl.innerHTML = '🎈 오늘 <b>' + total + '명</b>의 친구들이 놀러올 예정이에요';
+  }
+}
+
+function getCurrentItem() {
+  if (!state.viewingItemId) return null;
+  for (const g of state.groups) {
+    for (const it of g.items) {
+      if (it.itemId === state.viewingItemId) return { group: g, item: it };
+    }
+  }
+  return null;
+}
+
+function renderTimeslots(item) {
+  const list = document.getElementById('timeslotList');
+  if (!list) return;
+  list.innerHTML = '';
+  const now = new Date();
+  const currentHour = now.getHours();
+  const mine = myReservationInItem(item);
+  const isRangeMode = state.rangeMode && state.rangeForItemId === item.itemId;
+
+  if (isRangeMode) {
+    let timeText;
+    if (state.rangeStart === null) timeText = '시작 시간을 탭하세요';
+    else if (state.rangeEnd === null) timeText = formatHour(state.rangeStart) + ' ~ 종료 시간 탭';
+    else timeText = formatHour(state.rangeStart) + ' ~ ' + formatHour(state.rangeEnd + 1);
+    const canConfirm = state.rangeStart !== null && state.rangeEnd !== null;
+    const banner = document.createElement('div');
+    banner.className = 'range-banner';
+    banner.innerHTML = '<div class="range-banner-left"><div style="font-size:11px;opacity:0.9;">놀러올 시간 선택</div><div class="range-banner-time">' + timeText + '</div></div><div class="range-banner-actions"><button class="range-btn" onclick="cancelRangeMode()">취소</button><button class="range-btn confirm" ' + (canConfirm ? '' : 'disabled') + ' onclick="confirmRange()">' + (canConfirm ? '등록' : '...') + '</button></div>';
+    list.appendChild(banner);
+  } else if (mine) {
+    const myCard = document.createElement('div');
+    myCard.className = 'my-reservation';
+    myCard.innerHTML = '<div class="my-reservation-info">✓ 내 약속 등록됨<small>' + formatHour(mine.startHour) + ' ~ ' + formatHour(mine.endHour) + '</small></div><button class="my-reservation-cancel" onclick="cancelMyReservation()">취소</button>';
+    list.appendChild(myCard);
+  } else {
+    const startBtn = document.createElement('button');
+    startBtn.className = 'start-join-btn';
+    startBtn.textContent = '🎈 갈게요 — 시간 선택하기';
+    startBtn.onclick = () => startRangeMode(item.itemId);
+    list.appendChild(startBtn);
+  }
+
+  TIME_SLOTS.forEach(hour => {
+    const past = !state.demoMode && hour < currentHour;
+    const kids = kidsAtHourInItem(item, hour);
+    const hasKids = kids.length > 0;
+    const slot = document.createElement('div');
+    let cls = 'timeslot';
+    if (hasKids) cls += ' has-kids';
+    if (past) cls += ' past';
+    if (isRangeMode) {
+      cls += ' selecting';
+      if (past) cls += ' disabled-pick';
+      else if (state.rangeStart === hour) cls += ' range-start';
+      else if (state.rangeEnd === hour) cls += ' range-end';
+      else if (state.rangeStart !== null && state.rangeEnd !== null && hour > state.rangeStart && hour < state.rangeEnd) cls += ' range-middle';
+      else if (state.rangeStart !== null && state.rangeEnd === null) {
+        const maxEnd = state.rangeStart + MAX_HOURS - 1;
+        if (hour > state.rangeStart && hour > maxEnd) cls += ' disabled-pick';
+      }
+    }
+    slot.className = cls;
+    const period = hour < 12 ? '오전' : '오후';
+    const displayHour = hour <= 12 ? hour : hour - 12;
+    const countCls = kids.length === 0 ? 'zero' : '';
+    const maxAvatars = 3;
+    const avatarsHtml = kids.slice(0, maxAvatars).map(k => {
+      const ac = k.mine ? 'me' : (k.gender === '남아' ? 'boy' : k.gender === '여아' ? 'girl' : '');
+      // 익명성 강화: 닉네임 첫 글자 대신 나이만 표시 (예: 5)
+      const ageLabel = k.age != null ? String(k.age) : '?';
+      return '<div class="ts-avatar ' + ac + '">' + escapeHtml(ageLabel) + '</div>';
+    }).join('');
+    const moreHtml = kids.length > maxAvatars ? '<div class="ts-avatar-more">+' + (kids.length - maxAvatars) + '</div>' : '';
+    slot.innerHTML = '<div class="ts-time"><span class="ts-time-period">' + period + '</span>' + displayHour + '시</div><div class="ts-info"><div class="ts-count ' + countCls + '">' + kids.length + '명</div><div class="ts-avatars">' + avatarsHtml + moreHtml + '</div></div>';
+    if (hasKids && !isRangeMode) {
+      const detail = document.createElement('div');
+      detail.className = 'ts-detail';
+      kids.forEach(k => {
+        const chip = document.createElement('span');
+        chip.className = 'kid-chip' + (k.mine ? ' me' : '');
+        // 익명성 강화: 닉네임 노출 안 함. 본인은 '나'로, 타인은 '나이+성별'만
+        if (k.mine) {
+          chip.textContent = '나 (' + k.age + '세 ' + k.gender + ')';
+        } else {
+          chip.textContent = k.age + '세 ' + k.gender + (k.verified ? ' ✓' : '');
+        }
+        detail.appendChild(chip);
+      });
+      slot.appendChild(detail);
+      slot.style.cursor = 'pointer';
+      slot.addEventListener('click', () => slot.classList.toggle('expanded'));
+    }
+    if (isRangeMode && !past) {
+      slot.addEventListener('click', () => pickRangeSlot(hour));
+    }
+    list.appendChild(slot);
+  });
+}
+
+function findMyReservationAnywhere() {
+  for (const g of state.groups) {
+    for (const it of g.items) {
+      const mine = (it.reservations || []).find(r => r.mine);
+      if (mine) return { group: g, item: it, reservation: mine };
+    }
+  }
+  return null;
+}
+
+function startRangeMode(itemId) {
+  if (!state.me) { showToast('먼저 닉네임을 설정해주세요'); openSetup(); return; }
+  // 한 사람 한 약속 — 이미 다른 곳에 등록되어 있으면 차단
+  const existing = findMyReservationAnywhere();
+  if (existing && existing.item.itemId !== itemId) {
+    showToast('이미 다른 놀이터에 약속이 있어요. 취소 후 등록해주세요');
+    return;
+  }
+  state.rangeMode = true;
+  state.rangeStart = null;
+  state.rangeEnd = null;
+  state.rangeForItemId = itemId;
+  const ctx = getCurrentItem();
+  if (ctx) renderTimeslots(ctx.item);
+}
+
+function pickRangeSlot(hour) {
+  if (state.rangeStart === null) {
+    state.rangeStart = hour;
+    state.rangeEnd = null;
+  } else if (state.rangeEnd === null) {
+    if (hour === state.rangeStart) {
+      state.rangeEnd = hour;
+    } else if (hour < state.rangeStart) {
+      state.rangeStart = hour;
+      state.rangeEnd = null;
+    } else {
+      const duration = hour - state.rangeStart + 1;
+      if (duration > MAX_HOURS) { showToast('최대 ' + MAX_HOURS + '시간까지 선택 가능해요'); return; }
+      state.rangeEnd = hour;
+    }
+  } else {
+    state.rangeStart = hour;
+    state.rangeEnd = null;
+  }
+  const ctx = getCurrentItem();
+  if (ctx) renderTimeslots(ctx.item);
+}
+
+function confirmRange() {
+  if (state.rangeStart === null || state.rangeEnd === null) return;
+  const ctx = getCurrentItem();
+  if (!ctx) return;
+  const item = ctx.item;
+  item.reservations = (item.reservations || []).filter(r => !r.mine);
+  item.reservations.push({
+    userId: 'me-' + Date.now(),
+    nickname: state.me.nickname, age: parseInt(state.me.age),
+    gender: state.me.gender, verified: state.me.verified, mine: true,
+    startHour: state.rangeStart, endHour: state.rangeEnd + 1,
+  });
+  showToast(formatHour(state.rangeStart) + ' ~ ' + formatHour(state.rangeEnd + 1) + ' 등록 완료!');
+  state.rangeMode = false;
+  state.rangeStart = null;
+  state.rangeEnd = null;
+  state.rangeForItemId = null;
+  renderTimeslots(item);
+  renderMarkers();
+  renderList();
+  updateItemSummary(item);
+}
+
+function cancelRangeMode() {
+  state.rangeMode = false;
+  state.rangeStart = null;
+  state.rangeEnd = null;
+  state.rangeForItemId = null;
+  const ctx = getCurrentItem();
+  if (ctx) renderTimeslots(ctx.item);
+}
+
+function cancelMyReservation() {
+  const ctx = getCurrentItem();
+  if (!ctx) return;
+  ctx.item.reservations = (ctx.item.reservations || []).filter(r => !r.mine);
+  showToast('약속이 취소되었어요');
+  renderTimeslots(ctx.item);
+  renderMarkers();
+  renderList();
+  updateItemSummary(ctx.item);
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('show');
+  state.selectedGroupId = null;
+  state.viewingItemId = null;
+  if (state.rangeMode) {
+    state.rangeMode = false;
+    state.rangeStart = null;
+    state.rangeEnd = null;
+    state.rangeForItemId = null;
+  }
+}
+
+function closeModalBackdrop(e) {
+  if (e.target.id === 'modalBackdrop') closeModal();
+}
+
+function toggleDemoMode() {
+  state.demoMode = !state.demoMode;
+  document.getElementById('demoBadge').textContent = state.demoMode ? '🧪 데모 모드 (탭하여 끄기)' : '✅ 실제 모드';
+  state.groups.forEach(g => g.items.forEach(it => { it.reservations = generateMockReservations(); }));
+  renderMarkers();
+  renderList();
+  const ctx = getCurrentItem();
+  if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
+}
+
+function refreshData() {
+  state.groups.forEach(g => g.items.forEach(it => { it.reservations = generateMockReservations(); }));
+  renderMarkers();
+  renderList();
+  const ctx = getCurrentItem();
+  if (ctx) { renderTimeslots(ctx.item); updateItemSummary(ctx.item); }
+  showToast('새로고침 완료');
+}
+
+function formatHour(hour) {
+  if (hour < 12) return '오전 ' + hour + '시';
+  if (hour === 12) return '오후 12시';
+  if (hour === 24) return '자정';
+  return '오후 ' + (hour - 12) + '시';
+}
+
+function dist(a, b) {
+  const dx = (a.lng - b.lng) * 88;
+  const dy = (a.lat - b.lat) * 111;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>
+enderTimeslots(ctx.item); updateItemSummary(ctx.item); }
+  showToast('새로고침 완료');
+}
+
+function formatHour(hour) {
+  if (hour < 12) return '오전 ' + hour + '시';
+  if (hour === 12) return '오후 12시';
+  if (hour === 24) return '자정';
+  return '오후 ' + (hour - 12) + '시';
+}
+
+function dist(a, b) {
+  const dx = (a.lng - b.lng) * 88;
+  const dy = (a.lat - b.lat) * 111;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>
