@@ -500,9 +500,16 @@ function closeSafetyPage() {
 }
 
 const SHEET_MIN = 96;
+const SHEET_MID = 240;
 function sheetSnaps() {
   const vh = window.innerHeight;
-  return [SHEET_MIN, Math.round(vh * 0.45), Math.round(vh * 0.85)];
+  return [SHEET_MIN, SHEET_MID, Math.round(vh * 0.85)];
+}
+function nearestSnapIndex(h) {
+  const snaps = sheetSnaps();
+  let idx = 0, best = Infinity;
+  snaps.forEach((s, i) => { const d = Math.abs(s - h); if (d < best) { best = d; idx = i; } });
+  return idx;
 }
 function setSheetHeight(px) {
   const vh = window.innerHeight;
@@ -546,11 +553,16 @@ function snapSheet() {
     sheet.classList.remove('dragging');
     const cur = sheet.offsetHeight;
     const snaps = sheetSnaps();
+    const grew = cur > startH + 8;
+    const shrank = cur < startH - 8;
+    const startIdx = nearestSnapIndex(startH);
     let target;
-    if (Math.abs(vY) > 0.5) {
-      target = vY < 0 ? (cur < snaps[1] ? snaps[1] : snaps[2]) : (cur > snaps[1] ? snaps[1] : snaps[0]);
+    if (startIdx === 1) {
+      target = grew ? snaps[2] : shrank ? snaps[0] : snaps[1];
+    } else if (startIdx === 0) {
+      target = grew ? (cur > snaps[1] ? snaps[2] : snaps[1]) : snaps[0];
     } else {
-      target = snaps.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a);
+      target = shrank ? (cur < snaps[1] ? snaps[0] : snaps[1]) : snaps[2];
     }
     setSheetHeight(target);
   }
