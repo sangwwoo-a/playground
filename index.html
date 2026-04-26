@@ -265,6 +265,7 @@ signInAnonymously(auth).catch((err) => {
 </div>
 <div id="map"></div>
 <div class="map-controls">
+<button class="map-btn" onclick="openSheet()" aria-label="목록 보기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg></button>
 <button class="map-btn" onclick="centerToMe()" aria-label="현위치"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2 v3 M12 19 v3 M2 12 h3 M19 12 h3"/></svg></button>
 <button class="map-btn" onclick="refreshData()" aria-label="새로고침"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 a9 9 0 0 1 15.5 -6.3 L21 8"/><path d="M21 3 v5 h-5"/><path d="M21 12 a9 9 0 0 1 -15.5 6.3 L3 16"/><path d="M3 21 v-5 h5"/></svg></button>
 </div>
@@ -734,11 +735,19 @@ function closeSafetyPage() {
 }
 
 
-const SHEET_MIN = 96;
+const SHEET_MIN = 110;
 const SHEET_MID = 240;
 function sheetSnaps() {
   const vh = window.innerHeight;
   return [SHEET_MIN, SHEET_MID, Math.round(vh * 0.85)];
+}
+
+function openSheet() {
+  const sheet = document.getElementById('bottomSheet');
+  if (!sheet) return;
+  const snaps = sheetSnaps();
+  const cur = sheet.offsetHeight;
+  setSheetHeight(cur < snaps[1] - 20 ? snaps[1] : snaps[2]);
 }
 function nearestSnapIndex(h) {
   const snaps = sheetSnaps();
