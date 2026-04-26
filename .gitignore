@@ -20,3 +20,9 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# Claude Code 로컬 설정 (개인 환경 의존)
+.claude/
+
+# 디자인 패키지 (Claude Design 미리보기, 참고용)
+design/
