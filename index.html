@@ -5,6 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>오늘의놀이터</title>
 <style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+:root {
+  /* Brand */
+  --c-coral: #FF6B6B; --c-coral-soft: #FFE5E5; --c-coral-deep: #E84545;
+  --c-sky: #4A90E2; --c-sky-soft: #E5F0FB; --c-sky-deep: #2E6FBF;
+  /* Neutrals (warm) */
+  --c-cream: #FFF9F2; --c-bg: #FAFAF7; --c-card: #FFFFFF;
+  --c-line: #ECE7DF; --c-line-soft: #F4EFE6;
+  --c-ink: #2A2622; --c-ink-2: #5C544C; --c-ink-3: #9B9189; --c-ink-4: #C8BFB5;
+  /* Semantic */
+  --c-good: #2EBD8F; --c-warn: #F5A623; --c-danger: #E5484D;
+  /* Pin colors */
+  --pin-busy: #FF5A5F; --pin-some: #4A90E2; --pin-empty: #B8AFA5;
+  /* Typography */
+  --font: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', system-ui, sans-serif;
+  --t-xs: 11px; --t-sm: 13px; --t-md: 15px; --t-lg: 17px;
+  --t-xl: 20px; --t-2xl: 24px; --t-3xl: 28px;
+  --w-r: 400; --w-m: 500; --w-sb: 600; --w-b: 700;
+  /* Spacing */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 40px;
+  /* Radius */
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-2xl: 28px; --r-pill: 999px;
+  /* Shadows */
+  --sh-1: 0 1px 2px rgba(40, 30, 20, 0.05);
+  --sh-2: 0 4px 12px rgba(40, 30, 20, 0.08);
+  --sh-3: 0 8px 24px rgba(40, 30, 20, 0.12);
+  --sh-pin: 0 3px 8px rgba(0, 0, 0, 0.18);
+  --sh-modal: 0 -8px 32px rgba(40, 30, 20, 0.12);
+}
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f5f5f5; }
 body { display: flex; justify-content: center; }
@@ -15,14 +45,14 @@ body { display: flex; justify-content: center; }
 .me-badge { background: #fff; border: 1px solid #e5e5e5; border-radius: 20px; padding: 6px 12px; font-size: 12px; color: #555; cursor: pointer; }
 .search-bar { margin-top: 10px; background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 10px 14px; font-size: 13px; color: #888; }
 #map { width: 100%; height: 100%; background: #e8eef0; }
-.playground-flag { position: relative; cursor: pointer; padding-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
-.flag-bubble { background: #ff5a5f; color: #fff; padding: 6px 12px; border-radius: 14px; font-size: 13px; font-weight: 700; white-space: nowrap; min-width: 50px; text-align: center; border: 2px solid #fff; position: relative; } .flag-bubble::after { content: ""; position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%); width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 8px solid #fff; } .flag-bubble::before { content: ""; position: absolute; left: 50%; bottom: -3px; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #ff5a5f; z-index: 1; } .flag-bubble.few::before { border-top-color: #4a90e2; } .flag-bubble.empty::before { border-top-color: #aaa; } .flag-bubble.lots::before { border-top-color: #ff3b30; }
-.flag-bubble.few { background: #4a90e2; }
-.flag-bubble.empty { background: #aaa; }
-.flag-bubble.lots { background: #ff3b30; }
-.flag-bubble .group-count { position: absolute; top: -6px; right: -8px; background: #fff; color: #ff5a5f; font-size: 10px; font-weight: 700; border-radius: 8px; padding: 1px 5px; border: 1px solid #ff5a5f; }
-.flag-pole { width: 2px; height: 14px; background: #fff; margin: 0 auto; }
-.flag-dot { width: 10px; height: 10px; border-radius: 50%; background: #fff; margin: -2px auto 0; }
+.playground-flag { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.playground-flag:active { transform: scale(0.92); }
+.flag-bubble { position: relative; min-width: 44px; padding: 5px 10px 6px; border-radius: var(--r-pill); background: var(--pin-busy); color: #fff; font-size: var(--t-sm); font-weight: var(--w-b); text-align: center; letter-spacing: -0.01em; box-shadow: var(--sh-pin); display: inline-flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; }
+.flag-bubble::after { content: ""; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 10px; height: 10px; background: inherit; border-radius: 2px; }
+.flag-bubble.few { background: var(--pin-some); }
+.flag-bubble.empty { background: var(--pin-empty); }
+.flag-bubble.lots { background: var(--pin-busy); }
+.flag-bubble .group-count { background: rgba(255,255,255,0.25); padding: 1px 5px; border-radius: var(--r-pill); font-size: 10px; font-weight: var(--w-b); color: #fff; position: static; border: none; }
 .me-marker { width: 18px; height: 18px; background: #007aff; border: 3px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); }
 .bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); z-index: 5; max-height: 45%; display: flex; flex-direction: column; }
 .sheet-handle { width: 40px; height: 4px; background: #ddd; border-radius: 2px; margin: 8px auto 4px; }
